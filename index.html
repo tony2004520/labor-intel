@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>勞動新聞情報站 · Labor Intel</title>
+<meta name="description" content="即時國際勞動新聞監測，整合 AI 摘要與分析">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1923;--panel:#162232;--card:#1a2d42;--card-h:#1f3450;
+  --border:#243a52;--bd2:#1c2f44;
+  --text:#dce9f5;--mid:#8aaec8;--dim:#4a6a85;
+  --accent:#f0a500;--adim:#7a5200;
+  --live:#2ecc71;--r:4px;
+}
+html{font-size:15px}
+body{font-family:"IBM Plex Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 1.4rem;gap:.9rem;position:sticky;top:0;z-index:100;flex-shrink:0}
+.logo{font-family:"Noto Serif TC",serif;font-weight:700;font-size:1rem;white-space:nowrap}
+.logo em{color:var(--accent);font-style:normal;margin:0 .2rem}
+.live-pill{display:flex;align-items:center;gap:.38rem;font-size:.68rem;color:var(--live);white-space:nowrap;flex-shrink:0}
+.live-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--live);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.tinfo{font-size:.67rem;color:var(--dim);white-space:nowrap}
+.tinfo b{color:var(--mid)}
+.sp{flex:1}
+.tbtn{background:none;border:1px solid var(--border);color:var(--mid);font-size:.68rem;padding:.26rem .65rem;border-radius:var(--r);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:.35rem;transition:.15s;white-space:nowrap}
+.tbtn:hover{border-color:var(--accent);color:var(--accent)}
+.tbtn.spin .ri{animation:rot .6s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
+@keyframes spinA{to{transform:rotate(360deg)}}
+.layout{display:flex;flex:1;min-height:0;overflow:hidden}
+.sidebar{width:190px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:.6rem 0 1.5rem}
+.sb-s{font-size:.6rem;color:var(--dim);letter-spacing:.06em;padding:.85rem 1.1rem .28rem;text-transform:uppercase}
+.sb-btn{display:flex;align-items:center;gap:.45rem;width:100%;padding:.42rem 1.1rem;background:none;border:none;border-left:2px solid transparent;color:var(--mid);font-size:.74rem;text-align:left;cursor:pointer;font-family:inherit;transition:.12s}
+.sb-btn:hover{background:var(--card);color:var(--text)}
+.sb-btn.on{background:var(--card);color:var(--text);border-left-color:var(--accent)}
+.sb-cnt{margin-left:auto;font-size:.62rem;color:var(--dim);background:var(--bg);padding:.07rem .36rem;border-radius:2px;min-width:20px;text-align:center}
+.sb-div{height:1px;background:var(--bd2);margin:.5rem 1.1rem}
+.sw{margin:.55rem .8rem .15rem;position:relative}
+.sw input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:.73rem;padding:.36rem .55rem .36rem 1.7rem;border-radius:var(--r);outline:none;transition:.15s}
+.sw input:focus{border-color:var(--accent)}
+.sw input::placeholder{color:var(--dim)}
+.sw .si{position:absolute;left:.48rem;top:50%;transform:translateY(-50%);color:var(--dim);font-size:.8rem;pointer-events:none}
+.main{flex:1;overflow-y:auto;padding:1rem 1.2rem 3rem;min-width:0}
+.statusbar{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:.85rem;align-items:center}
+.si-i{font-size:.7rem;color:var(--dim)}
+.si-i b{color:var(--mid)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:.9rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column;transition:.15s}
+.card:hover{background:var(--card-h);border-color:#2e4e70}
+.ctop{padding:.78rem .88rem .58rem;display:flex;flex-direction:column;gap:.45rem}
+.cmeta{display:flex;align-items:center;gap:.38rem;flex-wrap:wrap}
+.spill{font-size:.59rem;font-weight:600;padding:.12rem .42rem;border-radius:2px;letter-spacing:.04em;color:#fff}
+.s-ILO{background:#1a5fa0}.s-OECD{background:#1a6f42}.s-AJ{background:#a83228}.s-TG{background:#a85a1a}.s-HRW{background:#5a2fa0}.s-Other{background:#3a4a5a}
+.rpill{font-size:.59rem;border:1px solid var(--border);color:var(--dim);padding:.12rem .42rem;border-radius:2px}
+.cdate{margin-left:auto;font-size:.62rem;color:var(--dim);white-space:nowrap}
+.ctitle{font-family:"Noto Serif TC",serif;font-size:.95rem;font-weight:600;line-height:1.65;color:var(--text)}
+.ctitle a{color:inherit;text-decoration:none}
+.ctitle a:hover{color:#a8d4f5}
+.aizone{border-top:1px solid var(--bd2);background:rgba(240,165,0,.035)}
+.aitog{display:flex;align-items:center;gap:.42rem;padding:.48rem .88rem;cursor:pointer;font-size:.69rem;color:var(--accent);border:none;background:none;font-family:inherit;width:100%;text-align:left;transition:.1s;user-select:none}
+.aitog:hover{background:rgba(240,165,0,.07)}
+.aitog .chev{margin-left:auto;font-size:.73rem;transition:transform .2s}
+.aitog.open .chev{transform:rotate(180deg)}
+.sm-spin{width:11px;height:11px;border:2px solid var(--adim);border-top-color:var(--accent);border-radius:50%;animation:spinA .6s linear infinite;flex-shrink:0}
+.aibody{padding:0 .88rem .78rem;display:none;flex-direction:column;gap:.55rem}
+.aibody.vis{display:flex}
+.ail{font-size:.6rem;color:var(--accent);letter-spacing:.05em;margin-bottom:.16rem}
+.ait{font-size:.77rem;line-height:1.73;color:var(--mid)}
+.aitags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.1rem}
+.aitag{font-size:.61rem;border:1px solid var(--adim);color:var(--accent);padding:.08rem .4rem;border-radius:2px}
+.cfoot{padding:.42rem .88rem;border-top:1px solid var(--bd2);display:flex;align-items:center}
+.csc{font-size:.61rem;color:var(--dim)}
+.clink{font-size:.66rem;color:var(--dim);text-decoration:none;margin-left:auto}
+.clink:hover{color:var(--accent)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.overlay.h{display:none}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1.7rem;max-width:440px;width:100%;display:flex;flex-direction:column;gap:.9rem}
+.modal h2{font-family:"Noto Serif TC",serif;font-size:1.03rem}
+.modal p{font-size:.77rem;color:var(--mid);line-height:1.68}
+.modal p a{color:var(--accent)}
+.modal input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:.78rem;padding:.48rem .65rem;border-radius:var(--r);outline:none}
+.modal input:focus{border-color:var(--accent)}
+.mbtns{display:flex;gap:.55rem;justify-content:flex-end;flex-wrap:wrap}
+.mbtn{border:1px solid var(--border);background:none;color:var(--mid);font-size:.73rem;padding:.38rem .85rem;border-radius:var(--r);cursor:pointer;font-family:inherit;transition:.15s}
+.mbtn:hover{border-color:var(--accent);color:var(--accent)}
+.mbtn.p{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.mbtn.p:hover{background:#d49400;border-color:#d49400}
+.mnote{font-size:.66rem;color:var(--dim);line-height:1.55}
+.ls{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 2rem;color:var(--dim);font-size:.8rem}
+.bs{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spinA .8s linear infinite}
+.es{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--dim);font-size:.8rem}
+.nkb{background:rgba(240,165,0,.08);border:1px solid var(--adim);border-radius:var(--r);padding:.65rem .95rem;font-size:.74rem;color:var(--accent);display:flex;align-items:center;gap:.7rem;margin-bottom:.85rem}
+.nkb button{background:var(--accent);border:none;color:#000;font-size:.68rem;font-weight:600;padding:.28rem .65rem;border-radius:var(--r);cursor:pointer;font-family:inherit;white-space:nowrap}
+.sh{grid-column:1/-1;font-size:.75rem;color:var(--mid);padding:.25rem 0 .1rem;border-bottom:1px solid var(--bd2);margin-bottom:.1rem}
+.sbadge{font-size:.59rem;border:1px solid var(--accent);color:var(--accent);padding:.12rem .42rem;border-radius:2px}
+@media(max-width:640px){.sidebar{display:none}.grid{grid-template-columns:1fr}.tinfo{display:none}}
+</style>
+</head>
+<body>
+
+<div class="overlay h" id="mo">
+  <div class="modal">
+    <h2>設定 Anthropic API Key</h2>
+    <p>本站使用 Claude AI 即時搜尋國際勞動新聞並生成摘要分析。請輸入您的 <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic API Key</a>。<br>金鑰僅儲存於您的瀏覽器本地（localStorage），不會傳至任何第三方伺服器。</p>
+    <input type="password" id="ki" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+    <div class="mbtns">
+      <button class="mbtn" onclick="closeM()">略過（只看種子新聞）</button>
+      <button class="mbtn p" onclick="saveKey()">確認啟用 AI</button>
+    </div>
+    <div class="mnote">Key 儲存後重新整理仍有效。可隨時點右上角「⚙ Key」重設或清除。</div>
+  </div>
+</div>
+
+<div class="overlay h" id="lso">
+  <div class="modal">
+    <h2>即時議題搜尋</h2>
+    <p>輸入任何勞動相關議題（中英文皆可），AI 將即時搜尋最新國際新聞並翻譯為繁體中文。</p>
+    <input type="text" id="lsi" placeholder="例：台灣外勞政策、AI 取代工作、最低工資、工會罷工…" autocomplete="off">
+    <div class="mbtns">
+      <button class="mbtn" onclick="closeLs()">取消</button>
+      <button class="mbtn p" onclick="doLs()">搜尋</button>
+    </div>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="logo">勞動新聞情報站 <em>·</em> Labor Intel</div>
+  <div class="live-pill">即時</div>
+  <div class="tinfo">更新：<b id="tu">—</b></div>
+  <div class="tinfo">下次：<b id="tc">—</b></div>
+  <div class="sp"></div>
+  <button class="tbtn" onclick="openM()">⚙ Key</button>
+  <button class="tbtn" onclick="openLs()">🔍 搜尋議題</button>
+  <button class="tbtn" id="rb" onclick="triggerRefresh()"><span class="ri">↻</span> 更新</button>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sw"><span class="si">⌕</span><input id="qi" type="text" placeholder="篩選標題…" oninput="applyF()"></div>
+    <div class="sb-s">來源</div>
+    <button class="sb-btn on" data-g="s" data-v="all">全部 <span class="sb-cnt" id="ca">—</span></button>
+    <button class="sb-btn" data-g="s" data-v="ILO">ILO <span class="sb-cnt" id="ci">—</span></button>
+    <button class="sb-btn" data-g="s" data-v="OECD">OECD <span class="sb-cnt" id="co">—</span></button>
+    <button class="sb-btn" data-g="s" data-v="Al Jazeera">Al Jazeera <span class="sb-cnt" id="caj">—</span></button>
+    <button class="sb-btn" data-g="s" data-v="The Guardian">The Guardian <span class="sb-cnt" id="ctg">—</span></button>
+    <button class="sb-btn" data-g="s" data-v="HRW">Human Rights Watch <span class="sb-cnt" id="ch">—</span></button>
+    <div class="sb-div"></div>
+    <div class="sb-s">地區</div>
+    <button class="sb-btn on" data-g="r" data-v="all">全部地區</button>
+    <button class="sb-btn" data-g="r" data-v="Global">全球議題</button>
+    <button class="sb-btn" data-g="r" data-v="USA">美洲</button>
+    <button class="sb-btn" data-g="r" data-v="UK">英國</button>
+    <button class="sb-btn" data-g="r" data-v="EU">歐盟</button>
+    <button class="sb-btn" data-g="r" data-v="Asia">亞洲</button>
+    <button class="sb-btn" data-g="r" data-v="India">印度</button>
+    <button class="sb-btn" data-g="r" data-v="ILO / UN">ILO／聯合國</button>
+    <div class="sb-div"></div>
+    <div class="sb-s">操作</div>
+    <button class="sb-btn" onclick="openLs()">🔍 輸入議題搜尋</button>
+    <button class="sb-btn" onclick="openM()">⚙ API Key 設定</button>
+  </aside>
+  <main class="main">
+    <div id="nkb" class="nkb" style="display:none">⚠ 尚未設定 API Key，AI 搜尋與分析功能未啟用。<button onclick="openM()">立即設定</button></div>
+    <div class="statusbar" id="sb">載入中…</div>
+    <div class="grid" id="grid"><div class="ls"><div class="bs"></div><div>初始化中…</div></div></div>
+  </main>
+</div>
+
+<script>
+const API='https://api.anthropic.com/v1/messages',MDL='claude-sonnet-4-6',RMS=20*60*1000;
+const TODAY=new Date().toISOString().slice(0,10);
+const SEED=[
+  {id:'s1',title:'ILO 通過首部平台經濟體面工作公約（第193號公約）',url:'https://www.ilo.org/resource/news/ilc/ilc114/international-labour-conference-ends-adoption-first-convention-decent-work',published:'2026-06-12',source:'ILO',location:'ILO / UN'},
+  {id:'s2',title:'OECD 就業展望 2026：勞動市場強勁，但實際工資增長滯後',url:'https://www.oecd.org/en/about/news/press-releases/2026/07/oecd-job-markets-remain-strong-but-real-wages-are-lagging.html',published:'2026-07-07',source:'OECD',location:'Global'},
+  {id:'s3',title:'聯合國通過條約為零工經濟工作者設定國際勞動標準',url:'https://www.aljazeera.com/news/2026/6/12/un-adopts-treaty-setting-standards-for-gig-economy-workers',published:'2026-06-12',source:'Al Jazeera',location:'ILO / UN'},
+  {id:'s4',title:'美國前勞工部長 Chavez-DeRemer 遭聯邦監察機構指控失職',url:'https://www.aljazeera.com/news/2026/9/4/watchdog-report-alleges-misconduct-by-trumps-former-labour-secretary',published:'2026-09-04',source:'Al Jazeera',location:'USA'},
+  {id:'s5',title:'ICJ 裁定罷工權受 ILO 第87號公約保護',url:'https://www.hrw.org/news/2026/06/12/ilo-adopts-landmark-treaty-on-gig-work',published:'2026-05-21',source:'HRW',location:'ILO / UN'},
+  {id:'s6',title:'OECD：30國最低工資實質增長，低薪工人抗通膨更具韌性',url:'https://www.oecd.org/en/publications/oecd-employment-outlook-2026_7e710f54-en/full-report/component-5.html',published:'2026-07-07',source:'OECD',location:'Global'},
+  {id:'s7',title:'五一國際勞動節全球集會：抗議戰爭衝擊就業與生活水準',url:'https://www.aljazeera.com/economy/2026/5/1/rallies-under-way-as-workers-gather-for-international-labour-day',published:'2026-05-01',source:'Al Jazeera',location:'Global'},
+  {id:'s8',title:'歐盟在 ILO 理事會聲明：支持全球供應鏈體面勞動標準',url:'https://www.eeas.europa.eu/delegations/un-geneva/ilo-governing-body-356th-session-eu-statement-possible-initiatives-complement-body-international_en',published:'2026-03-25',source:'ILO',location:'EU'},
+  {id:'s9',title:'德國2026年最低工資上調8.4%至13.9歐元，惠及660萬工人',url:'https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026/ilo-adopts-a-convention-setting-standards-for-the-gig-economy',published:'2026-01-01',source:'OECD',location:'EU'},
+  {id:'s10',title:'英國最低工資2026年升至12.71英鎊，創歷史新高',url:'https://tradingeconomics.com/united-kingdom/minimum-wages',published:'2026-04-01',source:'The Guardian',location:'UK'},
+  {id:'s11',title:'ILO《2026年就業與社會趨勢》：近3億工人陷極端貧困',url:'https://researchrepository.ilo.org/esploro/outputs/report/Employment-and-social-trends-2026/995684768902676',published:'2026-01-01',source:'ILO',location:'Global'},
+  {id:'s12',title:'印度要求零工平台在 eShram 登記工人，強化社會保障',url:'https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026/ilo-adopts-a-convention-setting-standards-for-the-gig-economy',published:'2026-06-22',source:'ILO',location:'India'},
+  {id:'s13',title:'勞動節2026：移民工人與工會面臨前所未有的職場權益挑戰',url:'https://www.parriva.com/labor-day-2026-workers-rights/',published:'2026-09-02',source:'Al Jazeera',location:'USA'},
+  {id:'s14',title:'ILO 青年就業全球趨勢 2026：青年失業率上升，求職難度加劇',url:'https://www.ilo.org/',published:'2026-01-01',source:'ILO',location:'Global'},
+  {id:'s15',title:'歐盟最低工資報告：各國月薪從620至2704歐元不等',url:'https://ec.europa.eu/eurostat/statistics-explained/index.php/Minimum_wage_statistics',published:'2026-01-01',source:'OECD',location:'EU'},
+];
+let arts=[],fSrc='all',fReg='all',fQ='',key='',rfTmr=null,cdTmr=null,nextAt=0;
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtD(iso){if(!iso)return'—';try{return new Date(iso+'T00:00:00').toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'})}catch{return iso}}
+function loadKey(){key=localStorage.getItem('li_key')||'';document.getElementById('nkb').style.display=key?'none':'flex'}
+function saveKey(){const v=document.getElementById('ki').value.trim();if(!v){alert('請輸入 API Key');return}key=v;localStorage.setItem('li_key',v);closeM();document.getElementById('nkb').style.display='none';triggerRefresh()}
+function openM(){document.getElementById('ki').value=key;document.getElementById('mo').classList.remove('h')}
+function closeM(){document.getElementById('mo').classList.add('h')}
+function openLs(){document.getElementById('lso').classList.remove('h')}
+function closeLs(){document.getElementById('lso').classList.add('h')}
+async function callClaude(msgs,tools){
+  if(!key)throw new Error('NO_KEY');
+  const b={model:MDL,max_tokens:1000,messages:msgs};
+  if(tools)b.tools=tools;
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(b)});
+  if(!r.ok){const e=await r.json().catch(()=>({error:{message:'HTTP '+r.status}}));throw new Error(e?.error?.message||'API '+r.status)}
+  return r.json();
+}
+async function fetchFresh(){
+  if(!key)return[];
+  try{
+    const d=await callClaude([{role:'user',content:'Search for 10 most recent international labor rights and employment news from 2026. Sources: ILO, OECD, Al Jazeera, The Guardian, HRW. Topics: workers rights, wages, gig economy, unions, labor policy.
+Return ONLY a JSON array. No markdown. Each object: {"id":"f1","title":"繁體中文標題","url":"real url","published":"YYYY-MM-DD","source":"ILO|OECD|Al Jazeera|The Guardian|HRW","location":"Global|USA|UK|EU|Asia|India|ILO / UN"}'}],[{type:'web_search_20250305',name:'web_search'}]);
+    const txt=d.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
+    const m=txt.match(/\[[\s\S]*?\]/);
+    if(!m)return[];
+    return JSON.parse(m[0]).map((a,i)=>({...a,id:'f'+Date.now()+i}));
+  }catch(e){console.warn('fresh:',e.message);return[]}
+}
+async function doLs(){
+  const q=document.getElementById('lsi').value.trim();
+  if(!q)return;
+  if(!key){alert('請先設定 API Key');return}
+  closeLs();
+  document.getElementById('grid').innerHTML=`<div class="ls"><div class="bs"></div><div>正在搜尋「${esc(q)}」相關勞動新聞…</div></div>`;
+  try{
+    const d=await callClaude([{role:'user',content:`Search for recent international news about this labor topic: "${q}". Find 8 relevant articles from ILO, OECD, Al Jazeera, The Guardian, HRW, Reuters, BBC.
+Return ONLY a JSON array. No markdown. Each object: {"id":"q1","title":"繁體中文標題","url":"real url","published":"YYYY-MM-DD or null","source":"ILO|OECD|Al Jazeera|The Guardian|HRW","location":"Global|USA|UK|EU|Asia|India|ILO / UN"}`}],[{type:'web_search_20250305',name:'web_search'}]);
+    const txt=d.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
+    const m=txt.match(/\[[\s\S]*?\]/);
+    const found=m?JSON.parse(m[0]).map((a,i)=>({...a,id:'q'+Date.now()+i,_sq:q})):[];
+    arts=merge(found,arts);renderGrid(q);
+  }catch(e){document.getElementById('grid').innerHTML=`<div class="es">搜尋失敗：${esc(e.message)}</div>`}
+}
+async function loadAi(id){
+  const idx=arts.findIndex(a=>a.id===id);if(idx<0)return;
+  if(!key){openM();return}
+  arts[idx]._aiL=true;arts[idx]._aiE=null;refreshAz(id);
+  try{
+    const a=arts[idx];
+    const d=await callClaude([{role:'user',content:`你是勞動政策研究員，針對以下新聞提供繁體中文分析。
+標題：${a.title}
+來源：${a.source} 地區：${a.location}
+網址：${a.url}
+回傳JSON（只JSON無markdown）：{"summary":"一句話摘要25字內","analysis":"深度分析80-100字含背景脈絡與政策影響","keywords":["詞1","詞2","詞3","詞4"]}`}]);
+    const txt=d.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
+    const m=txt.match(/\{[\s\S]*?\}/);
+    if(!m)throw new Error('no json');
+    arts[idx]._ai=JSON.parse(m[0]);
+  }catch(e){arts[idx]._aiE=e.message==='NO_KEY'?'請設定 API Key':e.message}
+  finally{arts[idx]._aiL=false;refreshAz(id);
+    const b2=document.getElementById('ab-'+id),t2=document.getElementById('at-'+id);
+    if(b2&&arts[idx]._ai){b2.classList.add('vis');t2?.classList.add('open')}
+  }
+}
+function toggleAi(id){const b=document.getElementById('ab-'+id),t=document.getElementById('at-'+id);if(!b)return;b.classList.toggle('vis');t?.classList.toggle('open',b.classList.contains('vis'))}
+function buildAz(a){
+  if(a._aiL)return`<button class="aitog open"><span class="sm-spin"></span> AI 分析中…</button><div class="aibody vis"><div class="ait" style="color:var(--dim)">請稍候…</div></div>`;
+  if(a._ai)return`<button class="aitog" id="at-${a.id}" onclick="toggleAi('${a.id}')">✦ AI 摘要與分析 <span class="chev">▾</span></button><div class="aibody" id="ab-${a.id}"><div><div class="ail">一句話摘要</div><div class="ait">${esc(a._ai.summary)}</div></div><div><div class="ail">深度分析</div><div class="ait">${esc(a._ai.analysis)}</div></div><div><div class="ail">關鍵詞</div><div class="aitags">${(a._ai.keywords||[]).map(k=>`<span class="aitag">${esc(k)}</span>`).join('')}</div></div></div>`;
+  if(a._aiE)return`<button class="aitog" onclick="loadAi('${a.id}')">✦ AI 分析失敗，點擊重試 <span class="chev">▾</span></button>`;
+  return`<button class="aitog" id="at-${a.id}" onclick="loadAi('${a.id}')">✦ AI 摘要與分析 <span class="chev">▾</span></button>`;
+}
+function refreshAz(id){const z=document.getElementById('az-'+id);if(z){const a=arts.find(x=>x.id===id);z.innerHTML=buildAz(a)}}
+function srcCls(s){return{ILO:'ILO',OECD:'OECD','Al Jazeera':'AJ','The Guardian':'TG',HRW:'HRW'}[s]||'Other'}
+function regOk(l){if(fReg==='all')return true;if(fReg==='Asia')return['Taiwan','Japan','South Korea','China','India','Asia'].includes(l);return l===fReg}
+function getF(){const q=fQ.trim().toLowerCase();return arts.filter(a=>(fSrc==='all'||a.source===fSrc)&&regOk(a.location)&&(!q||a.title.toLowerCase().includes(q)||(a.location||'').toLowerCase().includes(q)))}
+function merge(fresh,seed){const seen=new Set(),out=[];for(const a of[...fresh,...seed]){if(!seen.has(a.url)){seen.add(a.url);out.push({...a,_ai:a._ai||null,_aiL:false,_aiE:null})}}out.sort((a,b)=>(b.published||'').localeCompare(a.published||''));return out}
+function buildCard(a){
+  const sc=srcCls(a.source);
+  const sb=a._sq?`<span class="sbadge">搜：${esc(a._sq)}</span>`:'';
+  return`<article class="card" id="card-${a.id}"><div class="ctop"><div class="cmeta"><span class="spill s-${sc}">${esc(a.source)}</span><span class="rpill">${esc(a.location||'Global')}</span>${sb}<span class="cdate">${fmtD(a.published)}</span></div><h2 class="ctitle"><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a></h2></div><div class="aizone" id="az-${a.id}">${buildAz(a)}</div><div class="cfoot"><span class="csc">擷取 ${fmtD(TODAY)}</span><a class="clink" href="${esc(a.url)}" target="_blank" rel="noopener">原文 ↗</a></div></article>`;
+}
+function renderGrid(sq=''){
+  const f=getF(),g=document.getElementById('grid');
+  const cnt={};arts.forEach(a=>{cnt[a.source]=(cnt[a.source]||0)+1});
+  document.getElementById('ca').textContent=arts.length;
+  document.getElementById('ci').textContent=cnt['ILO']||0;
+  document.getElementById('co').textContent=cnt['OECD']||0;
+  document.getElementById('caj').textContent=cnt['Al Jazeera']||0;
+  document.getElementById('ctg').textContent=cnt['The Guardian']||0;
+  document.getElementById('ch').textContent=cnt['HRW']||0;
+  document.getElementById('sb').innerHTML=`<div class="si-i">顯示 <b>${f.length}</b> 篇</div><div class="si-i">收錄 <b>${arts.length}</b> 篇</div><div class="si-i">AI完成 <b>${arts.filter(a=>a._ai).length}</b> 篇</div>`;
+  if(!f.length){g.innerHTML='<div class="es">找不到符合條件的新聞。</div>';return}
+  const hdr=sq?`<div class="sh">搜尋：「${esc(sq)}」— 共 ${f.length} 篇</div>`:'';
+  g.innerHTML=hdr+f.map(buildCard).join('');
+}
+function applyF(){fQ=document.getElementById('qi').value;renderGrid()}
+document.querySelectorAll('.sb-btn[data-g]').forEach(b=>{b.addEventListener('click',()=>{const g=b.dataset.g;document.querySelectorAll(`.sb-btn[data-g="${g}"]`).forEach(x=>x.classList.remove('on'));b.classList.add('on');if(g==='s')fSrc=b.dataset.v;if(g==='r')fReg=b.dataset.v;renderGrid()})});
+function setT(){document.getElementById('tu').textContent=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function startCd(){clearInterval(cdTmr);nextAt=Date.now()+RMS;cdTmr=setInterval(()=>{const s=Math.max(0,Math.round((nextAt-Date.now())/1000));const el=document.getElementById('tc');if(el)el.textContent=s>60?Math.floor(s/60)+'分'+s%60+'秒':s+'秒'},1000)}
+async function triggerRefresh(){
+  const btn=document.getElementById('rb');btn.classList.add('spin');btn.disabled=true;
+  try{const f=await fetchFresh();arts=merge(f,arts);setT();renderGrid()}
+  catch(e){console.error(e)}
+  finally{btn.classList.remove('spin');btn.disabled=false}
+  startCd();clearTimeout(rfTmr);rfTmr=setTimeout(triggerRefresh,RMS);
+}
+(async()=>{
+  loadKey();
+  arts=merge([],SEED);setT();renderGrid();
+  if(!key){setTimeout(openM,700)}
+  else{const f=await fetchFresh();if(f.length){arts=merge(f,arts);setT();renderGrid()}}
+  startCd();rfTmr=setTimeout(triggerRefresh,RMS);
+})();
+document.getElementById('lsi').addEventListener('keydown',e=>{if(e.key==='Enter')doLs()});
+document.getElementById('ki').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey()});
+</script>
+</body>
+</html>
