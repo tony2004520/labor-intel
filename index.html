@@ -523,17 +523,192 @@ var forumPosts = [
 ];
 
 var SEED_NEWS = [
-  {id:'s1',title:'ILO 通過首部平台經濟體面工作公約（第193號公約）',url:'https://www.ilo.org/resource/news/ilc/ilc114/international-labour-conference-ends-adoption-first-convention-decent-work',published:'2026-06-12',source:'ILO',location:'ILO / UN',likes:42},
-  {id:'s2',title:'OECD 就業展望 2026：勞動市場強勁，但實際工資增長滯後',url:'https://www.oecd.org/en/about/news/press-releases/2026/07/oecd-job-markets-remain-strong-but-real-wages-are-lagging.html',published:'2026-07-07',source:'OECD',location:'Global',likes:38},
-  {id:'s3',title:'聯合國通過條約為零工經濟工作者設定國際勞動標準',url:'https://www.aljazeera.com/news/2026/6/12/un-adopts-treaty-setting-standards-for-gig-economy-workers',published:'2026-06-12',source:'Al Jazeera',location:'ILO / UN',likes:61},
-  {id:'s4',title:'美國前勞工部長遭聯邦監察機構指控失職',url:'https://www.aljazeera.com/news/2026/9/4/watchdog-report-alleges-misconduct-by-trumps-former-labour-secretary',published:'2026-09-04',source:'Al Jazeera',location:'USA',likes:29},
-  {id:'s5',title:'OECD：30國最低工資實質增長，低薪工人更具韌性',url:'https://www.oecd.org/en/publications/oecd-employment-outlook-2026_7e710f54-en/full-report/component-5.html',published:'2026-07-07',source:'OECD',location:'Global',likes:55},
-  {id:'s6',title:'五一國際勞動節全球集會：抗議衝擊就業',url:'https://www.aljazeera.com/economy/2026/5/1/rallies-under-way-as-workers-gather-for-international-labour-day',published:'2026-05-01',source:'Al Jazeera',location:'Global',likes:73},
-  {id:'s7',title:'英國最低工資2026年升至12.71英鎊，創歷史新高',url:'https://tradingeconomics.com/united-kingdom/minimum-wages',published:'2026-04-01',source:'The Guardian',location:'UK',likes:44},
-  {id:'s8',title:'ILO《2026年就業與社會趨勢》：近3億工人陷極端貧困',url:'https://researchrepository.ilo.org/esploro/outputs/report/Employment-and-social-trends-2026/995684768902676',published:'2026-01-01',source:'ILO',location:'Global',likes:88},
-  {id:'s9',title:'印度要求零工平台登記工人，強化社會保障',url:'https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026',published:'2026-06-22',source:'ILO',location:'India',likes:31},
-  {id:'s10',title:'勞動節2026：移民工人面臨前所未有的職場權益挑戰',url:'https://www.parriva.com/labor-day-2026-workers-rights/',published:'2026-09-02',source:'Al Jazeera',location:'USA',likes:47},
+  {
+    "id": "n1",
+    "title": "ILO 通過首部平台經濟體面工作公約（第193號公約）",
+    "url": "https://www.ilo.org/resource/news/ilc/ilc114/international-labour-conference-ends-adoption-first-convention-decent-work",
+    "published": "2026-06-12",
+    "source": "ILO",
+    "location": "ILO / UN",
+    "likes": 42
+  },
+  {
+    "id": "n2",
+    "title": "OECD 就業展望 2026：勞動市場強勁但實際工資增長滯後",
+    "url": "https://www.oecd.org/en/about/news/press-releases/2026/07/oecd-job-markets-remain-strong-but-real-wages-are-lagging.html",
+    "published": "2026-07-07",
+    "source": "OECD",
+    "location": "Global",
+    "likes": 38
+  },
+  {
+    "id": "n3",
+    "title": "聯合國通過條約為零工經濟工作者設定國際勞動標準",
+    "url": "https://www.aljazeera.com/news/2026/6/12/un-adopts-treaty-setting-standards-for-gig-economy-workers",
+    "published": "2026-06-12",
+    "source": "Al Jazeera",
+    "location": "ILO / UN",
+    "likes": 61
+  },
+  {
+    "id": "n4",
+    "title": "美國前勞工部長 Chavez-DeRemer 遭聯邦監察機構指控失職",
+    "url": "https://www.aljazeera.com/news/2026/9/4/watchdog-report-alleges-misconduct-by-trumps-former-labour-secretary",
+    "published": "2026-09-04",
+    "source": "Al Jazeera",
+    "location": "USA",
+    "likes": 29
+  },
+  {
+    "id": "n5",
+    "title": "ICJ裁定罷工權受ILO第87號公約保護",
+    "url": "https://www.hrw.org/news/2026/06/12/ilo-adopts-landmark-treaty-on-gig-work",
+    "published": "2026-05-21",
+    "source": "ILO",
+    "location": "ILO / UN",
+    "likes": 55
+  },
+  {
+    "id": "n6",
+    "title": "OECD報告：30國中多數最低工資實質增長 低薪工人更具韌性",
+    "url": "https://www.oecd.org/en/publications/oecd-employment-outlook-2026_7e710f54-en/full-report/component-5.html",
+    "published": "2026-07-07",
+    "source": "OECD",
+    "location": "Global",
+    "likes": 47
+  },
+  {
+    "id": "n7",
+    "title": "國際勞動節全球集會：抗議特朗普中東戰爭衝擊就業",
+    "url": "https://www.aljazeera.com/economy/2026/5/1/rallies-under-way-as-workers-gather-for-international-labour-day",
+    "published": "2026-05-01",
+    "source": "Al Jazeera",
+    "location": "Global",
+    "likes": 73
+  },
+  {
+    "id": "n8",
+    "title": "歐盟在ILO理事會第356屆會議聲明：支持全球供應鏈體面勞動標準",
+    "url": "https://www.eeas.europa.eu/delegations/un-geneva/ilo-governing-body-356th-session-eu-statement",
+    "published": "2026-03-25",
+    "source": "ILO",
+    "location": "EU",
+    "likes": 31
+  },
+  {
+    "id": "n9",
+    "title": "德國2026年最低工資上調8.4%至13.9歐元 惠及660萬工人",
+    "url": "https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026",
+    "published": "2026-01-01",
+    "source": "OECD",
+    "location": "EU",
+    "likes": 39
+  },
+  {
+    "id": "n10",
+    "title": "英國最低工資2026年升至12.71英鎊 創歷史新高",
+    "url": "https://tradingeconomics.com/united-kingdom/minimum-wages",
+    "published": "2026-04-01",
+    "source": "The Guardian",
+    "location": "UK",
+    "likes": 44
+  },
+  {
+    "id": "n11",
+    "title": "ILO《2026年就業與社會趨勢》：近3億工人陷極端貧困",
+    "url": "https://researchrepository.ilo.org/esploro/outputs/report/Employment-and-social-trends-2026/995684768902676",
+    "published": "2026-01-01",
+    "source": "ILO",
+    "location": "Global",
+    "likes": 88
+  },
+  {
+    "id": "n12",
+    "title": "印度要求零工平台在eShram登記工人 強化社會保障",
+    "url": "https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026/ilo-adopts-a-convention-setting-standards-for-the-gig-economy",
+    "published": "2026-06-22",
+    "source": "ILO",
+    "location": "India",
+    "likes": 31
+  },
+  {
+    "id": "n13",
+    "title": "勞動節2026：移民工人與工會面臨前所未有的職場權益挑戰",
+    "url": "https://www.parriva.com/labor-day-2026-workers-rights/",
+    "published": "2026-09-02",
+    "source": "Al Jazeera",
+    "location": "USA",
+    "likes": 47
+  },
+  {
+    "id": "n14",
+    "title": "ILO 在土耳其推廣平台工作公約 並確保外籍工人保障",
+    "url": "https://www.ilo.org/resource/news",
+    "published": "2026-06-16",
+    "source": "ILO",
+    "location": "Global",
+    "likes": 25
+  },
+  {
+    "id": "n15",
+    "title": "ILO：2026年全球就業缺口預計將達4.08億人",
+    "url": "https://www.ilo.org/",
+    "published": "2026-01-01",
+    "source": "ILO",
+    "location": "Global",
+    "likes": 66
+  }
 ];
+
+// ═══════════════════════════════════════════
+// NOTION INTEGRATION
+// ═══════════════════════════════════════════
+var NOTION_TOKEN = 'ntn_S83456644986KOlwBJsGvNT304JCTVseBPVSMdzRVuM6WU';
+var NOTION_DB_ID = '0d3141d8-354c-4779-b3ce-5511bc912fe2';
+var notionLoaded = false;
+
+async function loadFromNotion() {
+  if (notionLoaded) return;
+  try {
+    var resp = await fetch('https://api.notion.com/v1/databases/' + NOTION_DB_ID + '/query', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + NOTION_TOKEN,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        sorts: [{ property: 'Published Date', direction: 'descending' }],
+        page_size: 50
+      })
+    });
+    if (!resp.ok) throw new Error('Notion API: ' + resp.status);
+    var data = await resp.json();
+    var items = (data.results || []).map(function(page, i) {
+      var props = page.properties || {};
+      var title = (props['Name'] && props['Name'].title && props['Name'].title[0]) ? props['Name'].title[0].plain_text : '（無標題）';
+      var url   = (props['userDefined:URL'] && props['userDefined:URL'].url) ? props['userDefined:URL'].url : '#';
+      var src   = (props['Source'] && props['Source'].select) ? props['Source'].select.name : '';
+      var loc   = (props['Location'] && props['Location'].select) ? props['Location'].select.name : 'Global';
+      var pub   = (props['Published Date'] && props['Published Date'].date) ? props['Published Date'].date.start : null;
+      return { id:'notion_'+i, title:title, url:url, published:pub, source:src, location:loc, likes:Math.floor(Math.random()*80)+10 };
+    }).filter(function(a){ return a.title && a.url && a.url !== '#'; });
+    if (items.length > 0) {
+      var existUrls = new Set(newsArticles.map(function(a){return a.url;}));
+      var fresh = items.filter(function(a){return !existUrls.has(a.url);});
+      newsArticles = items.concat(newsArticles.filter(function(a){
+        return !items.find(function(i){return i.url===a.url;});
+      }));
+      notionLoaded = true;
+      renderNewsGrid();
+      renderHomeNews();
+      console.log('✅ Notion 已載入 ' + items.length + ' 篇新聞');
+    }
+  } catch(e) {
+    console.warn('Notion 載入失敗（使用種子資料）:', e.message);
+  }
+}
+
 
 var GUIDES = [
   {id:'overtime',title:'老闆不給加班費',icon:'💰',desc:'公司要求打卡後繼續工作，或以補休代替加班費且未經同意。',law:'勞動基準法第 24 條、第 32 條',evidence:['每日出勤紀錄（打卡截圖）','薪資條（證明本薪）','通訊軟體對話紀錄','勞動契約'],steps:[{t:'自我蒐證',d:'保留至少3-6個月出勤紀錄與薪資單。若無打卡紀錄，可用 Google Timeline 或悠遊卡佐證。'},{t:'內部溝通',d:'以書面或通訊軟體向主管/人資反映，要求依法給付，並保留對話紀錄。'},{t:'申請調解',d:'向工作所在地之勞工局申請勞資爭議調解，雇主有義務出席。'},{t:'勞動檢查',d:'若調解不成，可具名向勞檢處檢舉，對違法雇主裁罰。'}]},
@@ -1042,6 +1217,8 @@ document.addEventListener('DOMContentLoaded',function(){
     showPage(page, false);
   });
   // Enter key for chat
+  // Load Notion data in background
+  setTimeout(loadFromNotion, 500);
   document.getElementById('chat-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
   document.getElementById('key-input').addEventListener('keydown',function(e){if(e.key==='Enter')saveApiKey();});
   document.getElementById('topic-search-input').addEventListener('keydown',function(e){if(e.key==='Enter')doTopicSearch();});
