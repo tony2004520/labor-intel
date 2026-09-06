@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>勞動新聞情報站 · Labor Intel</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;600;700&display=swap');
@@ -15,9 +15,10 @@
 }
 html{font-size:15px}
 body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.hidden{display:none!important}
 
 /* TOPBAR */
-.topbar{background:var(--panel);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 1.2rem;gap:.8rem;position:sticky;top:0;z-index:100}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 1.2rem;gap:.8rem;position:sticky;top:0;z-index:100;flex-shrink:0}
 .logo{font-family:'Noto Serif TC',serif;font-weight:700;font-size:.95rem;white-space:nowrap;flex-shrink:0}
 .logo em{color:var(--accent);font-style:normal}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--live);animation:pulse 2s infinite;flex-shrink:0}
@@ -27,11 +28,29 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .sp{flex:1}
 .tbtn{background:none;border:1px solid var(--border);color:var(--mid);font-size:.68rem;padding:.28rem .65rem;border-radius:var(--r);cursor:pointer;font-family:inherit;white-space:nowrap;transition:.15s}
 .tbtn:hover{border-color:var(--accent);color:var(--accent)}
-.rbtn-spin{animation:spin .6s linear infinite;display:inline-block}
+.tbtn:disabled{opacity:.4;cursor:default}
 @keyframes spin{to{transform:rotate(360deg)}}
+.spinning{animation:spin .6s linear infinite;display:inline-block}
+
+/* KEY BAR — 固定在頂部的 key 輸入區，取代 modal */
+.keybar{background:#0d1e30;border-bottom:2px solid var(--accent);padding:.65rem 1.2rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.keybar-label{font-size:.75rem;color:var(--accent);white-space:nowrap;flex-shrink:0}
+.keybar input{flex:1;min-width:200px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:.75rem;padding:.38rem .65rem;border-radius:var(--r);outline:none}
+.keybar input:focus{border-color:var(--accent)}
+.keybar input::placeholder{color:var(--dim)}
+.keybar-save{background:var(--accent);border:none;color:#000;font-size:.73rem;font-weight:600;padding:.38rem .9rem;border-radius:var(--r);cursor:pointer;font-family:inherit;white-space:nowrap}
+.keybar-save:hover{background:#d49400}
+.keybar-note{font-size:.67rem;color:var(--dim);flex-basis:100%}
+.keybar-note a{color:var(--accent);text-decoration:none}
+
+/* KEY STATUS BAR — 已設定時顯示 */
+.keystatus{background:#0a1f12;border-bottom:1px solid #1a5e38;padding:.45rem 1.2rem;display:flex;align-items:center;gap:.75rem}
+.keystatus-ok{font-size:.73rem;color:var(--live)}
+.keystatus-clear{background:none;border:1px solid #1a5e38;color:#5a9a6a;font-size:.67rem;padding:.22rem .6rem;border-radius:var(--r);cursor:pointer;font-family:inherit;margin-left:auto}
+.keystatus-clear:hover{border-color:var(--live);color:var(--live)}
 
 /* LAYOUT */
-.layout{display:flex;flex:1}
+.layout{display:flex;flex:1;overflow:hidden}
 
 /* SIDEBAR */
 .sidebar{width:185px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:.6rem 0 2rem;overflow-y:auto}
@@ -45,23 +64,27 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .sw input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:.73rem;padding:.37rem .55rem .37rem 1.65rem;border-radius:var(--r);outline:none}
 .sw input:focus{border-color:var(--accent)}
 .sw input::placeholder{color:var(--dim)}
-.sw-icon{position:absolute;left:.48rem;top:50%;transform:translateY(-50%);color:var(--dim);pointer-events:none}
+.sw-icon{position:absolute;left:.48rem;top:50%;transform:translateY(-50%);color:var(--dim);pointer-events:none;font-size:.8rem}
 
 /* MAIN */
 .main{flex:1;padding:1rem 1.2rem 3rem;min-width:0;overflow-y:auto}
 .statbar{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:.85rem}
-.stat{font-size:.7rem;color:var(--dim)}
-.stat b{color:var(--mid)}
+.stat{font-size:.7rem;color:var(--dim)}.stat b{color:var(--mid)}
 
-/* BANNER */
-.banner{background:rgba(240,165,0,.08);border:1px solid var(--adim);border-radius:var(--r);padding:.6rem .9rem;font-size:.74rem;color:var(--accent);display:flex;align-items:center;gap:.7rem;margin-bottom:.85rem;flex-wrap:wrap}
-.banner button{background:var(--accent);border:none;color:#000;font-size:.68rem;font-weight:600;padding:.26rem .65rem;border-radius:var(--r);cursor:pointer;font-family:inherit}
+/* SEARCH BAR */
+.searchbar{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:.65rem .9rem;margin-bottom:.9rem;display:flex;align-items:center;gap:.65rem}
+.searchbar input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:.78rem;padding:.4rem .65rem;border-radius:var(--r);outline:none}
+.searchbar input:focus{border-color:var(--accent)}
+.searchbar input::placeholder{color:var(--dim)}
+.searchbar-btn{background:var(--accent);border:none;color:#000;font-size:.72rem;font-weight:600;padding:.4rem .9rem;border-radius:var(--r);cursor:pointer;font-family:inherit;white-space:nowrap}
+.searchbar-btn:hover{background:#d49400}
+.searchbar-label{font-size:.72rem;color:var(--accent);white-space:nowrap;flex-shrink:0}
 
 /* GRID */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.9rem}
 
 /* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column;transition:.15s}
 .card:hover{background:var(--card-h);border-color:#2e4e70}
 .ctop{padding:.78rem .88rem .58rem;display:flex;flex-direction:column;gap:.45rem}
 .cmeta{display:flex;align-items:center;gap:.38rem;flex-wrap:wrap}
@@ -75,7 +98,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 
 /* AI ZONE */
 .aizone{border-top:1px solid var(--bd2);background:rgba(240,165,0,.03)}
-.aitog{display:flex;align-items:center;gap:.42rem;padding:.48rem .88rem;cursor:pointer;font-size:.69rem;color:var(--accent);border:none;background:none;font-family:inherit;width:100%;text-align:left;user-select:none}
+.aitog{display:flex;align-items:center;gap:.42rem;padding:.48rem .88rem;cursor:pointer;font-size:.69rem;color:var(--accent);border:none;background:none;font-family:inherit;width:100%;text-align:left;user-select:none;transition:.1s}
 .aitog:hover{background:rgba(240,165,0,.07)}
 .aitog .chev{margin-left:auto;transition:transform .2s}
 .aitog.open .chev{transform:rotate(180deg)}
@@ -87,60 +110,22 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 .aitags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.08rem}
 .aitag{font-size:.61rem;border:1px solid var(--adim);color:var(--accent);padding:.08rem .4rem;border-radius:2px}
 
-/* FOOTER */
+/* CARD FOOT */
 .cfoot{padding:.42rem .88rem;border-top:1px solid var(--bd2);display:flex;align-items:center}
 .csc{font-size:.61rem;color:var(--dim)}
 .clink{font-size:.66rem;color:var(--dim);text-decoration:none;margin-left:auto}
 .clink:hover{color:var(--accent)}
-
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
-.overlay.hidden{display:none}
-.modal{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1.6rem;max-width:430px;width:100%;display:flex;flex-direction:column;gap:.85rem}
-.modal h2{font-family:'Noto Serif TC',serif;font-size:1rem}
-.modal p{font-size:.77rem;color:var(--mid);line-height:1.68}
-.modal p a{color:var(--accent);text-decoration:none}
-.modal input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:.78rem;padding:.46rem .65rem;border-radius:var(--r);outline:none}
-.modal input:focus{border-color:var(--accent)}
-.mbtns{display:flex;gap:.55rem;justify-content:flex-end;flex-wrap:wrap}
-.mbtn{border:1px solid var(--border);background:none;color:var(--mid);font-size:.73rem;padding:.38rem .85rem;border-radius:var(--r);cursor:pointer;font-family:inherit;transition:.15s}
-.mbtn:hover{border-color:var(--accent);color:var(--accent)}
-.mbtn.ok{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
-.mbtn.ok:hover{background:#d49400}
-.mnote{font-size:.66rem;color:var(--dim);line-height:1.55}
 .empty{grid-column:1/-1;text-align:center;padding:3rem;color:var(--dim);font-size:.82rem}
 
-@media(max-width:600px){.sidebar{display:none}.grid{grid-template-columns:1fr}.tinfo{display:none}}
+@media(max-width:600px){
+  .sidebar{display:none}
+  .grid{grid-template-columns:1fr}
+  .tinfo{display:none}
+  .keybar{padding:.6rem 1rem}
+}
 </style>
 </head>
 <body>
-
-<!-- KEY MODAL -->
-<div class="overlay hidden" id="key-modal">
-  <div class="modal">
-    <h2>設定 Anthropic API Key</h2>
-    <p>輸入您的 <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic API Key</a> 以啟用 AI 即時搜尋與分析功能。<br>Key 僅存於您的瀏覽器，不會傳送至任何第三方。</p>
-    <input type="password" id="key-input" placeholder="sk-ant-api03-..." autocomplete="off">
-    <div class="mbtns">
-      <button class="mbtn" id="key-skip">略過（只看現有新聞）</button>
-      <button class="mbtn ok" id="key-save">確認啟用</button>
-    </div>
-    <div class="mnote">儲存後重整頁面仍有效。可隨時點右上角「⚙ Key」重設。</div>
-  </div>
-</div>
-
-<!-- SEARCH MODAL -->
-<div class="overlay hidden" id="search-modal">
-  <div class="modal">
-    <h2>即時議題搜尋</h2>
-    <p>輸入任何勞動相關議題，AI 將即時搜尋最新國際新聞。</p>
-    <input type="text" id="search-input" placeholder="例：台灣外勞政策、AI取代工作、罷工…" autocomplete="off">
-    <div class="mbtns">
-      <button class="mbtn" id="search-cancel">取消</button>
-      <button class="mbtn ok" id="search-go">搜尋</button>
-    </div>
-  </div>
-</div>
 
 <!-- TOPBAR -->
 <header class="topbar">
@@ -149,10 +134,25 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
   <div class="tinfo">更新：<b id="t-time">—</b></div>
   <div class="tinfo">下次：<b id="t-cd">—</b></div>
   <div class="sp"></div>
-  <button class="tbtn" id="btn-key">⚙ Key</button>
-  <button class="tbtn" id="btn-search">🔍 搜尋議題</button>
-  <button class="tbtn" id="btn-refresh"><span id="refresh-icon">↻</span> 更新</button>
+  <button class="tbtn" id="btn-refresh"><span id="ri">↻</span> 更新</button>
 </header>
+
+<!-- KEY BAR（未設定 key 時顯示） -->
+<div id="keybar" class="keybar">
+  <span class="keybar-label">🔑 請輸入 Anthropic API Key 以啟用 AI 功能</span>
+  <input type="password" id="key-input" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+  <button class="keybar-save" id="key-save-btn">確認啟用</button>
+  <div class="keybar-note">
+    Key 僅存於您的瀏覽器，不傳至任何伺服器。
+    尚無 Key？前往 <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> 免費取得。
+  </div>
+</div>
+
+<!-- KEY STATUS（已設定 key 時顯示） -->
+<div id="keystatus" class="keystatus hidden">
+  <span class="keystatus-ok">✅ API Key 已啟用 — AI 搜尋與分析功能正常運作</span>
+  <button class="keystatus-clear" id="key-clear-btn">更換 / 清除 Key</button>
+</div>
 
 <div class="layout">
   <!-- SIDEBAR -->
@@ -178,19 +178,17 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
     <button class="sb-btn" data-g="reg" data-v="Asia">亞洲</button>
     <button class="sb-btn" data-g="reg" data-v="India">印度</button>
     <button class="sb-btn" data-g="reg" data-v="ILO / UN">ILO／聯合國</button>
-    <div class="sb-div"></div>
-    <div class="sb-label">功能</div>
-    <button class="sb-btn" id="sb-search">🔍 即時議題搜尋</button>
-    <button class="sb-btn" id="sb-key">⚙ API Key 設定</button>
   </aside>
 
   <!-- MAIN -->
   <main class="main">
-    <div class="banner hidden" id="no-key-banner">
-      ⚠ 尚未設定 API Key，AI 搜尋與分析功能未啟用。
-      <button id="banner-btn">立即設定</button>
+    <!-- 即時搜尋列 -->
+    <div class="searchbar">
+      <span class="searchbar-label">🔍 即時搜尋</span>
+      <input type="text" id="topic-input" placeholder="輸入任何勞動議題…（例：台灣外勞、AI取代工作、罷工）">
+      <button class="searchbar-btn" id="topic-btn">搜尋</button>
     </div>
-    <div class="statbar" id="statbar">
+    <div class="statbar">
       <div class="stat">收錄 <b id="s-total">0</b> 篇</div>
       <div class="stat">顯示 <b id="s-shown">0</b> 篇</div>
       <div class="stat">AI完成 <b id="s-ai">0</b> 篇</div>
@@ -200,8 +198,8 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tex
 </div>
 
 <script>
-// ── SEED DATA ────────────────────────────────────────────
-const SEED = [
+// ─── SEED DATA ───────────────────────────────────────────────────────────────
+var SEED = [
   {id:'s1',title:'ILO 通過首部平台經濟體面工作公約（第193號公約）',url:'https://www.ilo.org/resource/news/ilc/ilc114/international-labour-conference-ends-adoption-first-convention-decent-work',published:'2026-06-12',source:'ILO',location:'ILO / UN'},
   {id:'s2',title:'OECD 就業展望 2026：勞動市場強勁，但實際工資增長滯後',url:'https://www.oecd.org/en/about/news/press-releases/2026/07/oecd-job-markets-remain-strong-but-real-wages-are-lagging.html',published:'2026-07-07',source:'OECD',location:'Global'},
   {id:'s3',title:'聯合國通過條約為零工經濟工作者設定國際勞動標準',url:'https://www.aljazeera.com/news/2026/6/12/un-adopts-treaty-setting-standards-for-gig-economy-workers',published:'2026-06-12',source:'Al Jazeera',location:'ILO / UN'},
@@ -216,18 +214,16 @@ const SEED = [
   {id:'s12',title:'印度要求零工平台在 eShram 登記工人，強化社會保障',url:'https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2026/ilo-adopts-a-convention-setting-standards-for-the-gig-economy',published:'2026-06-22',source:'ILO',location:'India'},
   {id:'s13',title:'勞動節2026：移民工人與工會面臨前所未有的職場權益挑戰',url:'https://www.parriva.com/labor-day-2026-workers-rights/',published:'2026-09-02',source:'Al Jazeera',location:'USA'},
   {id:'s14',title:'ILO 青年就業全球趨勢 2026：青年失業率上升，求職難度加劇',url:'https://www.ilo.org/',published:'2026-01-01',source:'ILO',location:'Global'},
-  {id:'s15',title:'歐盟最低工資報告：各國月薪從620至2704歐元不等',url:'https://ec.europa.eu/eurostat/statistics-explained/index.php/Minimum_wage_statistics',published:'2026-01-01',source:'OECD',location:'EU'},
+  {id:'s15',title:'歐盟最低工資報告：各國月薪從620至2704歐元不等',url:'https://ec.europa.eu/eurostat/statistics-explained/index.php/Minimum_wage_statistics',published:'2026-01-01',source:'OECD',location:'EU'}
 ];
 
-// ── STATE ────────────────────────────────────────────────
-var arts = [];
-var fSrc = 'all', fReg = 'all', fQ = '';
-var apiKey = '';
-var refreshTimer = null, cdTimer = null, nextAt = 0;
+// ─── STATE ───────────────────────────────────────────────────────────────────
+var arts = [], fSrc = 'all', fReg = 'all', fQ = '', apiKey = '';
+var rfTimer = null, cdTimer = null, nextAt = 0;
 var TODAY = new Date().toISOString().slice(0,10);
 
-// ── HELPERS ──────────────────────────────────────────────
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtD(iso){
   if(!iso) return '—';
   try{ return new Date(iso+'T00:00:00').toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'}); }
@@ -242,67 +238,53 @@ function regOk(loc){
 function getFiltered(){
   var q = fQ.trim().toLowerCase();
   return arts.filter(function(a){
-    var srcOk = fSrc==='all' || a.source===fSrc;
-    var regOk2 = regOk(a.location);
-    var qOk = !q || a.title.toLowerCase().includes(q) || (a.location||'').toLowerCase().includes(q);
-    return srcOk && regOk2 && qOk;
+    return (fSrc==='all'||a.source===fSrc) && regOk(a.location) &&
+           (!q || a.title.toLowerCase().includes(q) || (a.location||'').toLowerCase().includes(q));
   });
 }
 function merge(fresh, seed){
   var seen = new Set(), out = [];
-  var all = fresh.concat(seed);
-  for(var i=0;i<all.length;i++){
-    var a = all[i];
-    if(!seen.has(a.url)){
+  [].concat(fresh, seed).forEach(function(a){
+    if(a && a.url && !seen.has(a.url)){
       seen.add(a.url);
-      out.push(Object.assign({_ai:null,_aiLoading:false,_aiError:null}, a));
+      out.push(Object.assign({_ai:null,_aiL:false,_aiE:null}, a));
     }
-  }
+  });
   out.sort(function(a,b){ return (b.published||'') > (a.published||'') ? 1 : -1; });
   return out;
 }
 
-// ── KEY MANAGEMENT ───────────────────────────────────────
+// ─── KEY MANAGEMENT ──────────────────────────────────────────────────────────
+var KEY_NAME = 'labor_intel_apikey_v2';
+
 function loadKey(){
-  try{ apiKey = localStorage.getItem('li_key') || ''; }
-  catch(e){ apiKey = ''; }
+  try { apiKey = localStorage.getItem(KEY_NAME) || ''; } catch(e){ apiKey=''; }
 }
-function saveKeyAction(){
-  var v = document.getElementById('key-input').value.trim();
-  if(!v){ alert('請輸入有效的 API Key'); return; }
-  apiKey = v;
-  try{ localStorage.setItem('li_key', v); } catch(e){}
-  hideModal('key-modal');
-  updateBanner();
-  doRefresh();
+function saveKey(val){
+  apiKey = val;
+  try { localStorage.setItem(KEY_NAME, val); } catch(e){}
+  showKeyStatus();
 }
-function updateBanner(){
-  var b = document.getElementById('no-key-banner');
-  if(b) b.classList.toggle('hidden', !!apiKey);
+function clearKey(){
+  apiKey = '';
+  try { localStorage.removeItem(KEY_NAME); } catch(e){}
+  showKeyBar();
+}
+function showKeyBar(){
+  document.getElementById('keybar').classList.remove('hidden');
+  document.getElementById('keystatus').classList.add('hidden');
+  document.getElementById('key-input').value = '';
+}
+function showKeyStatus(){
+  document.getElementById('keybar').classList.add('hidden');
+  document.getElementById('keystatus').classList.remove('hidden');
 }
 
-// ── MODALS ───────────────────────────────────────────────
-function showModal(id){
-  var el = document.getElementById(id);
-  if(el) el.classList.remove('hidden');
-}
-function hideModal(id){
-  var el = document.getElementById(id);
-  if(el) el.classList.add('hidden');
-}
-function openKeyModal(){
-  var ki = document.getElementById('key-input');
-  if(ki) ki.value = apiKey;
-  showModal('key-modal');
-}
-function openSearchModal(){ showModal('search-modal'); }
-
-// ── CLAUDE API ───────────────────────────────────────────
-async function callClaude(messages, useSearch){
-  if(!apiKey) throw new Error('NO_KEY');
+// ─── CLAUDE API ──────────────────────────────────────────────────────────────
+function callClaude(messages, useSearch){
   var body = { model:'claude-sonnet-4-6', max_tokens:1000, messages:messages };
   if(useSearch) body.tools = [{type:'web_search_20250305', name:'web_search'}];
-  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+  return fetch('https://api.anthropic.com/v1/messages', {
     method:'POST',
     headers:{
       'Content-Type':'application/json',
@@ -311,269 +293,255 @@ async function callClaude(messages, useSearch){
       'anthropic-dangerous-direct-browser-access':'true'
     },
     body: JSON.stringify(body)
+  }).then(function(r){
+    if(!r.ok) return r.json().then(function(e){ throw new Error((e.error&&e.error.message)||'HTTP '+r.status); });
+    return r.json();
   });
-  if(!resp.ok){
-    var err = await resp.json().catch(function(){ return {error:{message:'HTTP '+resp.status}}; });
-    throw new Error((err.error && err.error.message) || 'API '+resp.status);
-  }
-  return resp.json();
 }
-function extractText(data){
-  if(!data || !data.content) return '';
-  return data.content.filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
+function getText(data){
+  return (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
 }
-function parseJSON(txt){
+function parseArr(txt){
   var m = txt.match(/\[[\s\S]*\]/);
-  if(m){ try{ return JSON.parse(m[0]); } catch(e){} }
-  m = txt.match(/\{[\s\S]*\}/);
-  if(m){ try{ return JSON.parse(m[0]); } catch(e){} }
+  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
+  return null;
+}
+function parseObj(txt){
+  var m = txt.match(/\{[\s\S]*\}/);
+  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
   return null;
 }
 
-// ── FETCH FRESH NEWS ─────────────────────────────────────
-async function fetchFresh(){
-  if(!apiKey) return [];
-  try{
-    var data = await callClaude([{role:'user',content:'Search for 8 most recent international labor rights news from 2026. Sources: ILO OECD Al Jazeera The Guardian HRW. Return ONLY a JSON array, no markdown. Each item: {"id":"f1","title":"繁體中文標題","url":"real url","published":"YYYY-MM-DD","source":"ILO or OECD or Al Jazeera or The Guardian or HRW","location":"Global or USA or UK or EU or Asia or India or ILO / UN"}'}], true);
-    var txt = extractText(data);
-    var arr = parseJSON(txt);
+// ─── FETCH FRESH ─────────────────────────────────────────────────────────────
+function fetchFresh(){
+  if(!apiKey) return Promise.resolve([]);
+  return callClaude([{role:'user',content:'Search for 8 most recent 2026 international labor rights news. Sources: ILO OECD Al Jazeera The Guardian HRW.\nReturn ONLY a JSON array, no markdown:\n[{"id":"f1","title":"繁體中文標題","url":"real url","published":"YYYY-MM-DD","source":"ILO or OECD or Al Jazeera or The Guardian or HRW","location":"Global or USA or UK or EU or Asia or India or ILO / UN"}]'}], true)
+  .then(function(data){
+    var arr = parseArr(getText(data));
     if(!Array.isArray(arr)) return [];
-    return arr.map(function(a,i){ return Object.assign({}, a, {id:'f'+Date.now()+i}); });
-  } catch(e){ console.warn('fetchFresh failed:', e.message); return []; }
+    return arr.map(function(a,i){ return Object.assign({},a,{id:'f'+Date.now()+i}); });
+  }).catch(function(e){ console.warn('fetchFresh:',e.message); return []; });
 }
 
-// ── LIVE SEARCH ──────────────────────────────────────────
-async function doSearch(){
-  var q = (document.getElementById('search-input').value||'').trim();
+// ─── TOPIC SEARCH ────────────────────────────────────────────────────────────
+function doTopicSearch(){
+  var q = document.getElementById('topic-input').value.trim();
   if(!q) return;
-  if(!apiKey){ hideModal('search-modal'); openKeyModal(); return; }
-  hideModal('search-modal');
-  var grid = document.getElementById('grid');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--dim)">正在搜尋「'+esc(q)+'」相關新聞…</div>';
-  try{
-    var data = await callClaude([{role:'user',content:'Search for recent international news about this labor topic: "'+q+'". Find 8 relevant articles. Return ONLY a JSON array, no markdown. Each item: {"id":"q1","title":"繁體中文標題","url":"real url","published":"YYYY-MM-DD or null","source":"ILO or OECD or Al Jazeera or The Guardian or HRW","location":"Global or USA or UK or EU or Asia or India or ILO / UN"}'}], true);
-    var txt = extractText(data);
-    var arr = parseJSON(txt);
+  if(!apiKey){ alert('請先輸入 API Key（網頁頂部黃色區域）'); return; }
+  var btn = document.getElementById('topic-btn');
+  btn.textContent = '搜尋中…'; btn.disabled = true;
+  document.getElementById('grid').innerHTML = '<div class="empty">正在搜尋「'+esc(q)+'」相關勞動新聞…</div>';
+  callClaude([{role:'user',content:'Search for recent international news about this labor topic: "'+q+'". Find 8 articles.\nReturn ONLY JSON array, no markdown:\n[{"id":"q1","title":"繁體中文標題","url":"real url","published":"YYYY-MM-DD or null","source":"ILO or OECD or Al Jazeera or The Guardian or HRW","location":"Global or USA or UK or EU or Asia or India or ILO / UN"}]'}], true)
+  .then(function(data){
+    var arr = parseArr(getText(data));
     var found = Array.isArray(arr) ? arr.map(function(a,i){ return Object.assign({},a,{id:'q'+Date.now()+i,_sq:q}); }) : [];
     arts = merge(found, arts);
     renderGrid();
-  } catch(e){
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#e07070">搜尋失敗：'+esc(e.message)+'</div>';
-  }
+  }).catch(function(e){
+    document.getElementById('grid').innerHTML = '<div class="empty">搜尋失敗：'+esc(e.message)+'</div>';
+  }).finally(function(){
+    btn.textContent = '搜尋'; btn.disabled = false;
+  });
 }
 
-// ── AI ANALYSIS ──────────────────────────────────────────
-async function loadAi(id){
-  if(!apiKey){ openKeyModal(); return; }
+// ─── AI ANALYSIS ─────────────────────────────────────────────────────────────
+function loadAi(id){
+  if(!apiKey){ alert('請先輸入 API Key（網頁頂部黃色區域）'); return; }
   var idx = arts.findIndex(function(a){ return a.id===id; });
   if(idx<0) return;
-  arts[idx]._aiLoading = true;
-  arts[idx]._aiError = null;
-  refreshAiZone(id);
-  try{
-    var a = arts[idx];
-    var data = await callClaude([{role:'user',content:'你是勞動政策研究員。針對此新聞提供繁體中文分析。標題：'+a.title+' 來源：'+a.source+' 地區：'+a.location+' 回傳JSON（只JSON）：{"summary":"一句話摘要25字內","analysis":"深度分析80字含背景與影響","keywords":["詞1","詞2","詞3","詞4"]}'}], false);
-    var txt = extractText(data);
-    var obj = parseJSON(txt);
-    if(!obj || !obj.summary) throw new Error('解析失敗');
+  arts[idx]._aiL = true; arts[idx]._aiE = null;
+  refreshZone(id);
+  var a = arts[idx];
+  callClaude([{role:'user',content:'你是勞動政策研究員，針對此新聞提供繁體中文分析。\n標題：'+a.title+'\n來源：'+a.source+' 地區：'+a.location+'\nReturn ONLY JSON, no markdown:\n{"summary":"一句話摘要25字內","analysis":"深度分析80字含背景與政策影響","keywords":["詞1","詞2","詞3","詞4"]}'}], false)
+  .then(function(data){
+    var obj = parseObj(getText(data));
+    if(!obj||!obj.summary) throw new Error('解析失敗');
     arts[idx]._ai = obj;
-  } catch(e){
-    arts[idx]._aiError = e.message==='NO_KEY' ? '請設定 API Key' : e.message;
-  }
-  arts[idx]._aiLoading = false;
-  refreshAiZone(id);
-  // auto open
-  var body = document.getElementById('ai-body-'+id);
-  var tog  = document.getElementById('ai-tog-'+id);
-  if(body && arts[idx]._ai){ body.classList.add('vis'); if(tog) tog.classList.add('open'); }
+  }).catch(function(e){
+    arts[idx]._aiE = e.message;
+  }).finally(function(){
+    arts[idx]._aiL = false;
+    refreshZone(id);
+    // auto-open
+    var body = document.getElementById('ab-'+id);
+    var tog  = document.getElementById('at-'+id);
+    if(body && arts[idx]._ai){ body.classList.add('vis'); if(tog) tog.classList.add('open'); }
+    // update AI count
+    var el = document.getElementById('s-ai');
+    if(el) el.textContent = arts.filter(function(x){return x._ai;}).length;
+  });
 }
-function toggleAiBody(id){
-  var body = document.getElementById('ai-body-'+id);
-  var tog  = document.getElementById('ai-tog-'+id);
-  if(!body) return;
-  var v = body.classList.toggle('vis');
-  if(tog) tog.classList.toggle('open', v);
+function toggleAi(id){
+  var b = document.getElementById('ab-'+id);
+  var t = document.getElementById('at-'+id);
+  if(!b) return;
+  var v = b.classList.toggle('vis');
+  if(t) t.classList.toggle('open', v);
 }
-function buildAiZone(a){
-  if(a._aiLoading){
-    return '<button class="aitog open"><span class="ai-spin"></span>&nbsp;AI 分析中…</button>'
-         + '<div class="aibody vis"><div class="ait" style="color:var(--dim)">請稍候…</div></div>';
+function buildZone(a){
+  if(a._aiL){
+    return '<button class="aitog open"><span class="ai-spin"></span>&nbsp;AI 分析生成中…</button>'
+          +'<div class="aibody vis"><div class="ait" style="color:var(--dim)">請稍候約 10 秒…</div></div>';
   }
   if(a._ai){
-    var kw = (a._ai.keywords||[]).map(function(k){ return '<span class="aitag">'+esc(k)+'</span>'; }).join('');
-    return '<button class="aitog" id="ai-tog-'+a.id+'" onclick="toggleAiBody(\''+a.id+'\')">'
-         + '✦ AI 摘要與分析 <span class="chev">▾</span></button>'
-         + '<div class="aibody" id="ai-body-'+a.id+'">'
-         + '<div><div class="ail">一句話摘要</div><div class="ait">'+esc(a._ai.summary)+'</div></div>'
-         + '<div><div class="ail">深度分析</div><div class="ait">'+esc(a._ai.analysis)+'</div></div>'
-         + '<div><div class="ail">關鍵詞</div><div class="aitags">'+kw+'</div></div>'
-         + '</div>';
+    var kw = (a._ai.keywords||[]).map(function(k){return '<span class="aitag">'+esc(k)+'</span>';}).join('');
+    return '<button class="aitog" id="at-'+a.id+'" onclick="toggleAi(\''+a.id+'\')">'
+          +'✦ AI 摘要與分析 <span class="chev">▾</span></button>'
+          +'<div class="aibody" id="ab-'+a.id+'">'
+          +'<div><div class="ail">一句話摘要</div><div class="ait">'+esc(a._ai.summary)+'</div></div>'
+          +'<div><div class="ail">深度分析</div><div class="ait">'+esc(a._ai.analysis)+'</div></div>'
+          +'<div><div class="ail">關鍵詞</div><div class="aitags">'+kw+'</div></div>'
+          +'</div>';
   }
-  if(a._aiError){
-    return '<button class="aitog" onclick="loadAi(\''+a.id+'\')">✦ AI 分析失敗，點擊重試 <span class="chev">▾</span></button>';
+  if(a._aiE){
+    return '<button class="aitog" onclick="loadAi(\''+a.id+'\')">✦ 分析失敗，點擊重試 <span class="chev">▾</span></button>';
   }
-  return '<button class="aitog" id="ai-tog-'+a.id+'" onclick="loadAi(\''+a.id+'\')">'
-       + '✦ AI 摘要與分析 <span class="chev">▾</span></button>';
+  return '<button class="aitog" onclick="loadAi(\''+a.id+'\')">'
+        +'✦ AI 摘要與分析（點擊生成）<span class="chev">▾</span></button>';
 }
-function refreshAiZone(id){
-  var zone = document.getElementById('ai-zone-'+id);
-  if(!zone) return;
-  var a = arts.find(function(x){ return x.id===id; });
-  if(!a) return;
-  zone.innerHTML = buildAiZone(a);
+function refreshZone(id){
+  var z = document.getElementById('az-'+id);
+  if(!z) return;
+  var a = arts.find(function(x){return x.id===id;});
+  if(a) z.innerHTML = buildZone(a);
 }
 
-// ── RENDER ───────────────────────────────────────────────
+// ─── RENDER ──────────────────────────────────────────────────────────────────
 function buildCard(a){
   var sc = srcClass(a.source);
   var sq = a._sq ? '<span class="rpill" style="border-color:var(--accent);color:var(--accent)">搜：'+esc(a._sq)+'</span>' : '';
   return '<article class="card">'
-    + '<div class="ctop">'
-    + '<div class="cmeta"><span class="spill s-'+sc+'">'+esc(a.source)+'</span>'
-    + '<span class="rpill">'+esc(a.location||'Global')+'</span>'+sq
-    + '<span class="cdate">'+fmtD(a.published)+'</span></div>'
-    + '<h2 class="ctitle"><a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+esc(a.title)+'</a></h2>'
-    + '</div>'
-    + '<div class="aizone" id="ai-zone-'+a.id+'">'+buildAiZone(a)+'</div>'
-    + '<div class="cfoot"><span class="csc">擷取 '+fmtD(TODAY)+'</span>'
-    + '<a class="clink" href="'+esc(a.url)+'" target="_blank" rel="noopener">原文 ↗</a></div>'
-    + '</article>';
+    +'<div class="ctop"><div class="cmeta">'
+    +'<span class="spill s-'+sc+'">'+esc(a.source)+'</span>'
+    +'<span class="rpill">'+esc(a.location||'Global')+'</span>'+sq
+    +'<span class="cdate">'+fmtD(a.published)+'</span>'
+    +'</div><h2 class="ctitle"><a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+esc(a.title)+'</a></h2></div>'
+    +'<div class="aizone" id="az-'+a.id+'">'+buildZone(a)+'</div>'
+    +'<div class="cfoot"><span class="csc">擷取 '+fmtD(TODAY)+'</span>'
+    +'<a class="clink" href="'+esc(a.url)+'" target="_blank" rel="noopener">原文 ↗</a></div>'
+    +'</article>';
 }
 function renderGrid(){
-  var filtered = getFiltered();
-  var grid = document.getElementById('grid');
-  if(!grid) return;
-
-  // update counts
+  var f = getFiltered();
+  var g = document.getElementById('grid');
+  if(!g) return;
   var cnt = {};
-  arts.forEach(function(a){ cnt[a.source] = (cnt[a.source]||0)+1; });
+  arts.forEach(function(a){ cnt[a.source]=(cnt[a.source]||0)+1; });
   var el;
   el=document.getElementById('cnt-all');  if(el) el.textContent=arts.length;
-  el=document.getElementById('cnt-ILO');  if(el) el.textContent=cnt['ILO']||0;
-  el=document.getElementById('cnt-OECD'); if(el) el.textContent=cnt['OECD']||0;
+  el=document.getElementById('cnt-ILO');  if(el) el.textContent=cnt.ILO||0;
+  el=document.getElementById('cnt-OECD'); if(el) el.textContent=cnt.OECD||0;
   el=document.getElementById('cnt-AJ');   if(el) el.textContent=cnt['Al Jazeera']||0;
   el=document.getElementById('cnt-TG');   if(el) el.textContent=cnt['The Guardian']||0;
-  el=document.getElementById('cnt-HRW');  if(el) el.textContent=cnt['HRW']||0;
-
+  el=document.getElementById('cnt-HRW');  if(el) el.textContent=cnt.HRW||0;
   el=document.getElementById('s-total'); if(el) el.textContent=arts.length;
-  el=document.getElementById('s-shown'); if(el) el.textContent=filtered.length;
+  el=document.getElementById('s-shown'); if(el) el.textContent=f.length;
   el=document.getElementById('s-ai');    if(el) el.textContent=arts.filter(function(a){return a._ai;}).length;
-
-  if(!filtered.length){
-    grid.innerHTML='<div class="empty">找不到符合條件的新聞。</div>';
-    return;
-  }
-  grid.innerHTML = filtered.map(buildCard).join('');
+  if(!f.length){ g.innerHTML='<div class="empty">找不到符合條件的新聞。</div>'; return; }
+  g.innerHTML = f.map(buildCard).join('');
 }
 
-// ── REFRESH ──────────────────────────────────────────────
+// ─── TIME & REFRESH ──────────────────────────────────────────────────────────
 function setTime(){
-  var el = document.getElementById('t-time');
-  if(el) el.textContent = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  var el=document.getElementById('t-time');
+  if(el) el.textContent=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 function startCd(){
   clearInterval(cdTimer);
-  nextAt = Date.now() + 20*60*1000;
+  nextAt = Date.now()+20*60*1000;
   cdTimer = setInterval(function(){
-    var s = Math.max(0, Math.round((nextAt - Date.now())/1000));
-    var el = document.getElementById('t-cd');
+    var s = Math.max(0,Math.round((nextAt-Date.now())/1000));
+    var el=document.getElementById('t-cd');
     if(el) el.textContent = s>60 ? Math.floor(s/60)+'分'+s%60+'秒' : s+'秒';
-  }, 1000);
+  },1000);
 }
-async function doRefresh(){
-  var icon = document.getElementById('refresh-icon');
-  var btn  = document.getElementById('btn-refresh');
-  if(icon) icon.className='rbtn-spin';
+function doRefresh(){
+  var icon=document.getElementById('ri'), btn=document.getElementById('btn-refresh');
+  if(icon) icon.className='spinning';
   if(btn)  btn.disabled=true;
-  try{
-    var fresh = await fetchFresh();
-    arts = merge(fresh, arts);
-    setTime();
-    renderGrid();
-  } catch(e){ console.error('refresh error:', e); }
-  if(icon) icon.className='';
-  if(btn)  btn.disabled=false;
-  startCd();
-  clearTimeout(refreshTimer);
-  refreshTimer = setTimeout(doRefresh, 20*60*1000);
-}
-
-// ── EVENT WIRING ─────────────────────────────────────────
-function wireEvents(){
-  // Sidebar filter buttons
-  document.querySelectorAll('.sb-btn[data-g]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var g = btn.getAttribute('data-g');
-      document.querySelectorAll('.sb-btn[data-g="'+g+'"]').forEach(function(b){ b.classList.remove('on'); });
-      btn.classList.add('on');
-      if(g==='src') fSrc = btn.getAttribute('data-v');
-      if(g==='reg') fReg = btn.getAttribute('data-v');
-      renderGrid();
-    });
+  fetchFresh().then(function(fresh){
+    arts=merge(fresh,arts); setTime(); renderGrid();
+  }).catch(function(e){ console.error(e); })
+  .finally(function(){
+    if(icon) icon.className=''; if(btn) btn.disabled=false;
+    startCd();
+    clearTimeout(rfTimer);
+    rfTimer=setTimeout(doRefresh,20*60*1000);
   });
-
-  // Filter input
-  var fi = document.getElementById('filter-input');
-  if(fi) fi.addEventListener('input', function(){ fQ=fi.value; renderGrid(); });
-
-  // Topbar buttons
-  var bk=document.getElementById('btn-key'); if(bk) bk.addEventListener('click', openKeyModal);
-  var bs=document.getElementById('btn-search'); if(bs) bs.addEventListener('click', openSearchModal);
-  var br=document.getElementById('btn-refresh'); if(br) br.addEventListener('click', doRefresh);
-
-  // Sidebar shortcuts
-  var sbS=document.getElementById('sb-search'); if(sbS) sbS.addEventListener('click', openSearchModal);
-  var sbK=document.getElementById('sb-key');    if(sbK) sbK.addEventListener('click', openKeyModal);
-
-  // Banner
-  var bb=document.getElementById('banner-btn'); if(bb) bb.addEventListener('click', openKeyModal);
-
-  // Key modal buttons
-  var ksk=document.getElementById('key-skip'); if(ksk) ksk.addEventListener('click', function(){ hideModal('key-modal'); });
-  var ksv=document.getElementById('key-save'); if(ksv) ksv.addEventListener('click', saveKeyAction);
-  var ki=document.getElementById('key-input');
-  if(ki) ki.addEventListener('keydown', function(e){ if(e.key==='Enter') saveKeyAction(); });
-
-  // Search modal buttons
-  var sc=document.getElementById('search-cancel'); if(sc) sc.addEventListener('click', function(){ hideModal('search-modal'); });
-  var sg=document.getElementById('search-go');     if(sg) sg.addEventListener('click', doSearch);
-  var si=document.getElementById('search-input');
-  if(si) si.addEventListener('keydown', function(e){ if(e.key==='Enter') doSearch(); });
-
-  // Click outside modal to close
-  document.getElementById('key-modal').addEventListener('click', function(e){ if(e.target===this) hideModal('key-modal'); });
-  document.getElementById('search-modal').addEventListener('click', function(e){ if(e.target===this) hideModal('search-modal'); });
 }
 
-// ── BOOT ─────────────────────────────────────────────────
+// ─── BOOT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
-  // 1. Wire all events
-  wireEvents();
 
-  // 2. Load key from storage
+  // 1. Load key from storage
   loadKey();
-  updateBanner();
 
-  // 3. Render seed data IMMEDIATELY — no async, no waiting
+  // 2. Show correct key UI based on whether key exists
+  if(apiKey){
+    showKeyStatus();
+  } else {
+    showKeyBar();
+  }
+
+  // 3. Render seed news immediately
   arts = merge([], SEED);
   setTime();
   renderGrid();
 
-  // 4. Start countdown
+  // 4. Sidebar filter buttons
+  document.querySelectorAll('.sb-btn[data-g]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var g = btn.getAttribute('data-g');
+      document.querySelectorAll('.sb-btn[data-g="'+g+'"]').forEach(function(b){b.classList.remove('on');});
+      btn.classList.add('on');
+      if(g==='src') fSrc=btn.getAttribute('data-v');
+      if(g==='reg') fReg=btn.getAttribute('data-v');
+      renderGrid();
+    });
+  });
+
+  // 5. Filter input
+  document.getElementById('filter-input').addEventListener('input', function(){
+    fQ=this.value; renderGrid();
+  });
+
+  // 6. Refresh button
+  document.getElementById('btn-refresh').addEventListener('click', doRefresh);
+
+  // 7. Key save button
+  document.getElementById('key-save-btn').addEventListener('click', function(){
+    var v = document.getElementById('key-input').value.trim();
+    if(!v){ alert('請輸入 API Key'); return; }
+    if(!v.startsWith('sk-ant')){ alert('格式不對，API Key 應以 sk-ant 開頭'); return; }
+    saveKey(v);
+    doRefresh();
+  });
+
+  // 8. Key input — Enter to save
+  document.getElementById('key-input').addEventListener('keydown', function(e){
+    if(e.key==='Enter'){
+      document.getElementById('key-save-btn').click();
+    }
+  });
+
+  // 9. Clear key button
+  document.getElementById('key-clear-btn').addEventListener('click', function(){
+    clearKey();
+  });
+
+  // 10. Topic search
+  document.getElementById('topic-btn').addEventListener('click', doTopicSearch);
+  document.getElementById('topic-input').addEventListener('keydown', function(e){
+    if(e.key==='Enter') doTopicSearch();
+  });
+
+  // 11. Start countdown & auto-refresh
   startCd();
-
-  // 5. If key exists, fetch fresh news in background
   if(apiKey){
-    fetchFresh().then(function(fresh){
-      if(fresh.length){ arts = merge(fresh, arts); renderGrid(); setTime(); }
-    }).catch(function(e){ console.warn('background fetch:', e); });
+    doRefresh();
   } else {
-    // Show key modal after a brief delay (non-blocking)
-    setTimeout(function(){ openKeyModal(); }, 800);
+    rfTimer = setTimeout(doRefresh, 20*60*1000);
   }
-
-  // 6. Schedule auto-refresh
-  refreshTimer = setTimeout(doRefresh, 20*60*1000);
 });
 </script>
 </body>
