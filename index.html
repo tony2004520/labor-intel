@@ -547,7 +547,13 @@ var GUIDES = [
 // ═══════════════════════════════════════════
 // PAGE NAVIGATION
 // ═══════════════════════════════════════════
-function showPage(page) {
+function showPage(page, pushState) {
+  if (pushState !== false) {
+    var hash = page === 'home' ? '#' : '#' + page;
+    if (window.location.hash !== hash) {
+      history.pushState({page: page}, '', hash);
+    }
+  }
   ['home','news','knowledge','consultant','forum','chat'].forEach(function(p) {
     var el = document.getElementById('page-'+p);
     if (!el) return;
@@ -1024,7 +1030,17 @@ document.addEventListener('DOMContentLoaded',function(){
   loadApiKey();
   newsArticles = SEED_NEWS.slice();
   calcUpdate();
-  showPage('home');
+  // Read hash from URL to support back/forward
+  var initialPage = window.location.hash.replace('#','') || 'home';
+  var validPages = ['home','news','knowledge','consultant','forum','chat'];
+  if (validPages.indexOf(initialPage) === -1) initialPage = 'home';
+  showPage(initialPage, false);
+  // Handle browser back/forward buttons
+  window.addEventListener('popstate', function(e) {
+    var page = (e.state && e.state.page) ? e.state.page : (window.location.hash.replace('#','') || 'home');
+    if (validPages.indexOf(page) === -1) page = 'home';
+    showPage(page, false);
+  });
   // Enter key for chat
   document.getElementById('chat-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
   document.getElementById('key-input').addEventListener('keydown',function(e){if(e.key==='Enter')saveApiKey();});
