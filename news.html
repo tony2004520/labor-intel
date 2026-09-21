@@ -7,34 +7,549 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --bg: #f8fafc;
-    --card-bg: #fff;
-    --text: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --tag-bg: #eff6ff;
-    --tag-color: #2563eb;
+    --primary: #2563eb; --primary-dark: #1d4ed8;
+    --bg: #f8fafc; --card-bg: #fff;
+    --text: #1e293b; --text-muted: #64748b;
+    --border: #e2e8f0; --tag-bg: #eff6ff; --tag-color: #2563eb;
   }
-
   body { font-family: -apple-system, "Noto Sans TC", sans-serif; background: var(--bg); color: var(--text); }
 
-  /* Navbar */
   nav {
-    background: #fff;
-    border-bottom: 1px solid var(--border);
-    padding: 0 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem; display: flex; align-items: center;
+    justify-content: space-between; height: 60px;
+    position: sticky; top: 0; z-index: 100;
   }
+  .nav-logo { font-weight: 800; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 0.9rem; }
+  .nav-links a.active { color: var(--primary); font-weight: 600; }
+  .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+  .auth-btn { padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.88rem; cursor: pointer; border: none; font-weight: 600; }
+  .btn-login { background: var(--primary); color: #fff; }
+  .btn-logout { background: #f1f5f9; color: var(--text-muted); }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+  .user-info { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; }
+
+  .hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #fff; padding: 3rem 1.5rem; text-align: center;
+  }
+  .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .hero p { opacity: 0.85; font-size: 1rem; margin-bottom: 1.5rem; }
+  .search-wrap { max-width: 560px; margin: 0 auto; display: flex; gap: 0.5rem; }
+  .search-wrap input {
+    flex: 1; padding: 0.75rem 1rem; border-radius: 8px;
+    border: none; font-size: 1rem; outline: none;
+  }
+  .search-wrap button {
+    padding: 0.75rem 1.25rem; background: #f59e0b; color: #fff;
+    border: none; border-radius: 8px; font-weight: 700; cursor: pointer;
+  }
+  .search-wrap button:hover { background: #d97706; }
+
+  .tab-bar {
+    max-width: 1200px; margin: 1.5rem auto 0;
+    padding: 0 1.5rem; display: flex;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab {
+    padding: 0.6rem 1.2rem; cursor: pointer; font-size: 0.9rem;
+    color: var(--text-muted); border-bottom: 2px solid transparent;
+    margin-bottom: -2px; font-weight: 600;
+  }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  .source-tabs {
+    max-width: 1200px; margin: 1rem auto 0;
+    padding: 0 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;
+  }
+  .source-btn {
+    padding: 0.35rem 0.9rem; border-radius: 20px;
+    border: 1.5px solid var(--border); background: #fff;
+    font-size: 0.82rem; cursor: pointer; color: var(--text-muted);
+    transition: all .15s;
+  }
+  .source-btn:hover, .source-btn.active {
+    background: var(--primary); border-color: var(--primary); color: #fff;
+  }
+
+  .sort-bar {
+    max-width: 1200px; margin: 0.75rem auto 0;
+    padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between;
+  }
+  .sort-bar span { font-size: 0.85rem; color: var(--text-muted); }
+  .sort-select { padding: 0.3rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #fff; }
+
+  .news-grid {
+    max-width: 1200px; margin: 1.25rem auto 3rem;
+    padding: 0 1.5rem;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .card {
+    background: var(--card-bg); border-radius: 12px;
+    overflow: hidden; border: 1px solid var(--border);
+    transition: box-shadow .2s, transform .2s; cursor: pointer;
+    display: flex; flex-direction: column;
+  }
+  .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
+
+  .card-img-wrap {
+    width: 100%; height: 170px; overflow: hidden;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; color: #93c5fd; flex-shrink: 0;
+  }
+  .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+  .card-body { padding: 1rem; display: flex; flex-direction: column; flex: 1; }
+  .card-source { font-size: 0.72rem; font-weight: 600; color: var(--primary); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: .05em; }
+  .card-title { font-size: 0.97rem; font-weight: 700; line-height: 1.4; margin-bottom: 0.5rem; flex: 1; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.5rem; }
+  .tag { background: var(--tag-bg); color: var(--tag-color); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 500; }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+  .card-date { font-size: 0.78rem; color: var(--text-muted); }
+  .bookmark-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 0.2rem; transition: transform .15s; }
+  .bookmark-btn:hover { transform: scale(1.2); }
+
+  .ext-link-badge {
+    font-size: 0.7rem; color: var(--text-muted);
+    background: #f1f5f9; padding: 0.1rem 0.4rem;
+    border-radius: 3px; margin-left: 0.3rem;
+  }
+
+  .loading, .empty {
+    text-align: center; padding: 4rem 1rem;
+    color: var(--text-muted); grid-column: 1/-1;
+  }
+  .spinner {
+    display: inline-block; width: 28px; height: 28px;
+    border: 3px solid #ddd; border-top-color: var(--primary);
+    border-radius: 50%; animation: spin .7s linear infinite;
+    vertical-align: middle; margin-right: 0.5rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    z-index: 200; display: none; align-items: center;
+    justify-content: center; padding: 1rem;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 16px;
+    max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1rem; position: sticky; top: 0; background: #fff; z-index: 1;
+  }
+  .modal-title { font-size: 1.15rem; font-weight: 800; line-height: 1.4; }
+  .modal-close {
+    background: #f1f5f9; border: none; border-radius: 50%;
+    width: 32px; height: 32px; cursor: pointer; font-size: 1rem; flex-shrink: 0;
+  }
+  .modal-img { width: 100%; max-height: 280px; object-fit: cover; }
+  .modal-body { padding: 1.5rem; }
+  .modal-meta { display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; }
+  .modal-content { font-size: 0.95rem; line-height: 1.8; }
+  .modal-content p { margin-bottom: 1rem; }
+  .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .modal-btn {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.5rem 1rem; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff; cursor: pointer;
+    font-size: 0.88rem; transition: all .2s; text-decoration: none; color: var(--text);
+  }
+  .modal-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .modal-btn.bookmarked { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
+
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #1e293b; color: #fff; padding: 0.7rem 1.5rem;
+    border-radius: 8px; font-size: 0.9rem; z-index: 300;
+    transition: transform .3s; pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5rem; }
+    .news-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">⚖️ Labortopics</a>
+  <div class="nav-links">
+    <a href="index.html">首頁</a>
+    <a href="news.html" class="active">勞動新聞</a>
+    <a href="index.html#qa">法規問答</a>
+  </div>
+  <div class="nav-right" id="authArea">
+    <button class="auth-btn btn-login" onclick="loginWithGoogle()">🔑 Google 登入</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>📰 勞動新聞中心</h1>
+  <p>精選文章 × 即時國際新聞，掌握所有勞動時事</p>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="搜尋議題：資遣、職災、最低工資、工會…"
+      onkeydown="if(event.key==='Enter')doSearch()">
+    <button onclick="doSearch()">搜尋</button>
+  </div>
+</div>
+
+<!-- Tab：所有新聞 / 我的收藏 -->
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('news',this)">🗞️ 所有新聞</div>
+  <div class="tab" onclick="switchTab('bookmarks',this)">❤️ 我的收藏</div>
+</div>
+
+<!-- 新聞頁 -->
+<div id="newsTab">
+  <div class="source-tabs">
+    <button class="source-btn active" onclick="filterSource('all',this)">全部</button>
+    <button class="source-btn" onclick="filterSource('sheet',this)">✍️ 精選文章</button>
+    <button class="source-btn" onclick="filterSource('news',this)">🌐 即時新聞</button>
+    <button class="source-btn" onclick="filterSource('ILO',this)">ILO</button>
+    <button class="source-btn" onclick="filterSource('台灣',this)">🇹🇼 台灣</button>
+    <button class="source-btn" onclick="filterSource('國際',this)">🌍 國際</button>
+  </div>
+  <div class="sort-bar">
+    <span id="resultCount"></span>
+    <select class="sort-select" onchange="currentSort=this.value;renderArticles()">
+      <option value="date_desc">最新優先</option>
+      <option value="date_asc">最舊優先</option>
+    </select>
+  </div>
+  <div class="news-grid" id="newsGrid">
+    <div class="loading"><span class="spinner"></span>載入新聞中…</div>
+  </div>
+</div>
+
+<!-- 收藏頁 -->
+<div id="bookmarksTab" style="display:none;">
+  <div class="news-grid" id="bookmarksGrid">
+    <div class="empty">登入後即可查看收藏 ❤️</div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <img class="modal-img" id="modalImg" style="display:none" alt="">
+    <div class="modal-body">
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-content" id="modalContent"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL  = 'https://ghovsfwxziysqfftvknn.supabase.co'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdob3ZzZnd4eml5c3FmZnR2a25uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NDk5MzEsImV4cCI6MjEwNTIyNTkzMX0.TOzya_TaMp02v9099snu6MWzIZLGvVsN8DTeGcPTlVE'
+const SHEET_ID      = '1qzCpWNwrXntkDa-cBYlkUGB_l3c4B9alk-jTNhS7Sb4'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+
+// RSS Proxy（CORS-free）
+const RSS_PROXY = 'https://api.rss2json.com/v1/api.json?rss_url='
+
+// 新聞 RSS 來源
+const NEWS_SOURCES = [
+  { name: '台灣勞動', tag: '台灣', url: 'https://news.google.com/rss/search?q=台灣+勞工+OR+勞動+OR+勞基法&hl=zh-TW&gl=TW&ceid=TW:zh-Hant' },
+  { name: '國際勞工', tag: '國際', url: 'https://news.google.com/rss/search?q=labor+rights+OR+workers+rights+OR+ILO&hl=en&gl=US&ceid=US:en' },
+  { name: 'ILO', tag: 'ILO', url: 'https://www.ilo.org/wcmsp5/groups/public/---dgreports/---dcomm/documents/genericdocument/wcms_decl_wp_85_en.xml' },
+]
+
+let allArticles = []
+let currentSource = 'all'
+let currentSearch = ''
+let currentSort = 'date_desc'
+let currentUser = null
+let userBookmarks = new Set()
+let currentArticle = null
+
+// ── 初始化 ──
+async function init() {
+  await checkAuth()
+  await Promise.all([loadSheetArticles(), loadNewsArticles()])
+  applyFilters()
+}
+
+// ── Auth ──
+async function loginWithGoogle() {
+  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href } })
+}
+async function logout() {
+  await sb.auth.signOut()
+  currentUser = null; userBookmarks.clear()
+  renderAuthArea(); renderBookmarks(); renderArticles()
+}
+async function checkAuth() {
+  const { data: { session } } = await sb.auth.getSession()
+  if (session?.user) { currentUser = session.user; await loadBookmarks() }
+  renderAuthArea()
+  sb.auth.onAuthStateChange(async (_, session) => {
+    currentUser = session?.user || null
+    renderAuthArea()
+    if (currentUser) await loadBookmarks()
+    else userBookmarks.clear()
+    renderArticles(); renderBookmarks()
+  })
+}
+function renderAuthArea() {
+  const area = document.getElementById('authArea')
+  if (currentUser) {
+    const name = currentUser.user_metadata?.name || currentUser.email
+    const avatar = currentUser.user_metadata?.avatar_url
+    area.innerHTML = `
+      <div class="user-info">
+        ${avatar ? `<img class="user-avatar" src="${avatar}" alt="">` : ''}
+        <span>${name.split(' ')[0]}</span>
+      </div>
+      <button class="auth-btn btn-logout" onclick="logout()">登出</button>`
+  } else {
+    area.innerHTML = `<button class="auth-btn btn-login" onclick="loginWithGoogle()">🔑 Google 登入</button>`
+  }
+}
+
+// ── 載入 Google Sheet 文章 ──
+async function loadSheetArticles() {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=工作表1`
+    const res = await fetch(url)
+    const text = await res.text()
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1])
+    const cols = json.table.cols.map(c => c.label)
+    const rows = json.table.rows
+      .map(row => {
+        const obj = {}
+        cols.forEach((col, i) => { obj[col] = row.c[i]?.v || '' })
+        return obj
+      })
+      .filter(a => a.title)
+      .map(a => ({
+        id: 'sheet_' + a.id,
+        title: a.title,
+        date: a.date,
+        author: a.author,
+        tags: a.tags,
+        cover_image: a.cover_image,
+        content_image: a.content_image,
+        content: a.content,
+        source: 'sheet',
+        source_label: '✍️ 精選',
+        link: null,
+      }))
+    allArticles.push(...rows)
+  } catch(e) { console.warn('Sheet 載入失敗', e) }
+}
+
+// ── 載入即時新聞 RSS ──
+async function loadNewsArticles() {
+  const fetches = NEWS_SOURCES.map(async src => {
+    try {
+      const res = await fetch(RSS_PROXY + encodeURIComponent(src.url))
+      const data = await res.json()
+      if (data.status !== 'ok') return []
+      return data.items.slice(0, 20).map((item, i) => ({
+        id: `news_${src.tag}_${i}`,
+        title: item.title,
+        date: item.pubDate ? item.pubDate.substring(0,10) : '',
+        author: item.author || src.name,
+        tags: src.tag,
+        cover_image: item.enclosure?.link || item.thumbnail || '',
+        content_image: '',
+        content: item.description || item.content || '',
+        source: 'news',
+        source_label: src.name,
+        source_tag: src.tag,
+        link: item.link,
+      }))
+    } catch(e) { return [] }
+  })
+  const results = await Promise.all(fetches)
+  results.forEach(r => allArticles.push(...r))
+}
+
+// ── 篩選與搜尋 ──
+function filterSource(src, el) {
+  currentSource = src
+  document.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'))
+  el.classList.add('active')
+  applyFilters()
+}
+function doSearch() {
+  currentSearch = document.getElementById('searchInput').value.trim()
+  applyFilters()
+}
+function applyFilters() {
+  let results = [...allArticles]
+  if (currentSource !== 'all') {
+    if (currentSource === 'sheet') results = results.filter(a => a.source === 'sheet')
+    else if (currentSource === 'news') results = results.filter(a => a.source === 'news')
+    else results = results.filter(a => (a.source_tag || a.tags || '').includes(currentSource))
+  }
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase()
+    results = results.filter(a =>
+      (a.title||'').toLowerCase().includes(q) ||
+      (a.content||'').toLowerCase().includes(q) ||
+      (a.tags||'').toLowerCase().includes(q) ||
+      (a.author||'').toLowerCase().includes(q)
+    )
+  }
+  results.sort((a, b) => {
+    if (currentSort === 'date_desc') return new Date(b.date) - new Date(a.date)
+    return new Date(a.date) - new Date(b.date)
+  })
+  document.getElementById('resultCount').textContent = `共 ${results.length} 篇`
+  window._filtered = results
+  renderArticles()
+}
+function renderArticles() {
+  const results = window._filtered || []
+  const grid = document.getElementById('newsGrid')
+  if (!results.length) { grid.innerHTML = '<div class="empty">沒有找到相關文章 🔍</div>'; return }
+  grid.innerHTML = results.map(a => cardHTML(a)).join('')
+}
+
+function cardHTML(a) {
+  const isBookmarked = userBookmarks.has(a.id)
+  const imgUrl = getImgUrl(a.cover_image)
+  const tags = (a.tags||'').split(',').filter(Boolean).map(t => `<span class="tag">${t.trim()}</span>`).join('')
+  const extBadge = a.link ? `<span class="ext-link-badge">外部連結</span>` : ''
+  return `
+    <div class="card" onclick="openArticle('${a.id}')">
+      <div class="card-img-wrap">
+        ${imgUrl ? `<img src="${imgUrl}" alt="" onerror="this.parentElement.innerHTML='📰'">` : '📰'}
+      </div>
+      <div class="card-body">
+        <div class="card-source">${a.source_label || ''}${extBadge}</div>
+        <div class="card-title">${a.title}</div>
+        <div class="card-tags">${tags}</div>
+        <div class="card-meta">
+          <span class="card-date">🗓 ${(a.date||'').substring(0,10)}</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark('${a.id}','${escHtml(a.title)}','${(a.date||'').substring(0,10)}',this)">
+            ${isBookmarked ? '❤️' : '🤍'}
+          </button>
+        </div>
+      </div>
+    </div>`
+}
+
+function escHtml(s) { return (s||'').replace(/'/g,"&#39;") }
+
+function getImgUrl(url) {
+  if (!url) return null
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/)
+  if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`
+  return url
+}
+
+// ── 開啟文章 ──
+function openArticle(id) {
+  const a = allArticles.find(x => x.id === id)
+  if (!a) return
+  currentArticle = a
+  document.getElementById('modalTitle').textContent = a.title
+  const imgUrl = getImgUrl(a.content_image || a.cover_image)
+  const mi = document.getElementById('modalImg')
+  if (imgUrl) { mi.src = imgUrl; mi.style.display = 'block'; mi.onerror = () => mi.style.display = 'none' }
+  else mi.style.display = 'none'
+  const tags = (a.tags||'').split(',').filter(Boolean).map(t => `<span class="tag">${t.trim()}</span>`).join(' ')
+  document.getElementById('modalMeta').innerHTML =
+    `<span>🗓 ${(a.date||'').substring(0,10)}</span><span>✍️ ${a.author||'編輯部'}</span><span>${tags}</span>`
+  // 清理 HTML 內容
+  const div = document.createElement('div')
+  div.innerHTML = a.content || '（內文準備中）'
+  document.getElementById('modalContent').textContent = div.textContent || div.innerText
+  // 按鈕
+  const isBookmarked = userBookmarks.has(id)
+  document.getElementById('modalActions').innerHTML = `
+    <button class="modal-btn ${isBookmarked?'bookmarked':''}" id="modalBmBtn" onclick="toggleBookmarkModal()">
+      ${isBookmarked?'❤️ 已收藏':'🤍 加入收藏'}
+    </button>
+    ${a.link ? `<a class="modal-btn" href="${a.link}" target="_blank" rel="noopener">🔗 閱讀原文</a>` : ''}
+  `
+  document.getElementById('modalOverlay').classList.add('show')
+  document.body.style.overflow = 'hidden'
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.body.style.overflow = '' }
+function closeModalBg(e) { if (e.target === document.getElementById('modalOverlay')) closeModal() }
+
+// ── 收藏 ──
+async function toggleBookmark(id, title, date, btn) {
+  if (!currentUser) { showToast('請先登入才能收藏 🔑'); return }
+  if (userBookmarks.has(id)) {
+    await sb.from('bookmarks').delete().eq('user_id', currentUser.id).eq('article_id', id)
+    userBookmarks.delete(id)
+    if (btn) btn.textContent = '🤍'
+    showToast('已取消收藏')
+  } else {
+    await sb.from('bookmarks').upsert({ user_id: currentUser.id, article_id: id, article_title: title, article_date: date })
+    userBookmarks.add(id)
+    if (btn) btn.textContent = '❤️'
+    showToast('已加入收藏 ❤️')
+  }
+  renderBookmarks()
+}
+async function toggleBookmarkModal() {
+  if (!currentArticle) return
+  const a = currentArticle
+  await toggleBookmark(a.id, a.title, a.date, null)
+  const isBookmarked = userBookmarks.has(a.id)
+  const btn = document.getElementById('modalBmBtn')
+  if (btn) { btn.textContent = isBookmarked ? '❤️ 已收藏' : '🤍 加入收藏'; btn.classList.toggle('bookmarked', isBookmarked) }
+}
+async function loadBookmarks() {
+  if (!currentUser) return
+  const { data } = await sb.from('bookmarks').select('article_id').eq('user_id', currentUser.id)
+  userBookmarks = new Set((data||[]).map(b => b.article_id))
+}
+async function renderBookmarks() {
+  const grid = document.getElementById('bookmarksGrid')
+  if (!currentUser) { grid.innerHTML = '<div class="empty">登入後即可查看收藏 ❤️</div>'; return }
+  if (userBookmarks.size === 0) { grid.innerHTML = '<div class="empty">還沒有收藏任何文章，點 🤍 加入收藏</div>'; return }
+  const bm = allArticles.filter(a => userBookmarks.has(a.id))
+  grid.innerHTML = bm.length ? bm.map(a => cardHTML(a)).join('') : '<div class="empty">收藏文章不在目前資料中</div>'
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  document.getElementById('newsTab').style.display = tab === 'news' ? 'block' : 'none'
+  document.getElementById('bookmarksTab').style.display = tab === 'bookmarks' ? 'block' : 'none'
+  if (tab === 'bookmarks') renderBookmarks()
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg; t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 2500)
+}
+
+init()
+</script>
+</body>
+</html>  }
   .nav-logo { font-weight: 800; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
   .nav-links { display: flex; gap: 1.5rem; align-items: center; }
   .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 0.9rem; transition: color .2s; }
