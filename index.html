@@ -57,27 +57,15 @@
       <button onclick="showPage('chat')" class="ml-2 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>AI 諮詢</button>
     </div>
-    <!-- API Key status -->
+    <!-- 勞動新聞連結 -->
     <div class="flex items-center gap-2">
-      <button onclick="toggleKeyBar()" id="key-status-btn" class="text-xs border border-slate-200 text-slate-500 px-3 py-1.5 rounded-full hover:border-blue-400 hover:text-blue-600 transition">⚙ API Key</button>
+      <a href="news.html" class="text-xs border border-blue-200 text-blue-600 px-3 py-1.5 rounded-full hover:bg-blue-50 transition font-medium">📰 勞動新聞</a>
     </div>
   </div>
-  <!-- Key input bar -->
-  <div id="keybar" class="hidden bg-amber-50 border-t border-amber-200 px-4 py-3">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center gap-3">
-      <span class="text-sm font-medium text-amber-800">🔑 Anthropic API Key（AI 功能必填）</span>
-      <input type="password" id="key-input" placeholder="sk-ant-api03-..." class="flex-1 min-w-48 text-sm border border-amber-300 rounded-lg px-3 py-1.5 bg-white outline-none focus:border-blue-400">
-      <button onclick="saveApiKey()" class="bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold px-4 py-1.5 rounded-lg transition">確認啟用</button>
-      <span class="text-xs text-amber-700">Key 只存在您的瀏覽器，不傳送至任何伺服器。<a href="https://console.anthropic.com/settings/keys" target="_blank" class="underline">取得 Key →</a></span>
-    </div>
-  </div>
-  <!-- Key active bar -->
-  <div id="keyactive" class="hidden bg-green-50 border-t border-green-200 px-4 py-2">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <span class="text-sm text-green-700 font-medium">✅ API Key 已啟用，AI 功能正常運作</span>
-      <button onclick="clearApiKey()" class="text-xs text-green-600 border border-green-300 px-3 py-1 rounded-full hover:bg-green-100 transition">更換 Key</button>
-    </div>
-  </div>
+  <!-- 隱藏的虛擬元素，保留 ID 相容性 -->
+  <div id="keybar" class="hidden"></div>
+  <div id="keyactive" class="hidden"></div>
+  <input id="key-input" class="hidden">
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════
@@ -720,6 +708,46 @@ var GUIDES = [
 ];
 
 // ═══════════════════════════════════════════
+// RSS NEWS LOADER
+// ═══════════════════════════════════════════
+async function loadRSSNews() {
+  var RSS = 'https://api.rss2json.com/v1/api.json?rss_url=';
+  var sources = [
+    {url:'https://news.google.com/rss/search?q=台灣+勞工+OR+勞動+OR+勞基法&hl=zh-TW&gl=TW&ceid=TW:zh-Hant', source:'台灣', location:'Taiwan'},
+    {url:'https://news.google.com/rss/search?q=labor+rights+OR+workers+rights+ILO&hl=en&gl=US&ceid=US:en', source:'ILO', location:'Global'},
+    {url:'https://news.google.com/rss/search?q=labor+news+OECD+workers&hl=en&gl=US&ceid=US:en', source:'OECD', location:'Global'},
+  ];
+  var all = [];
+  for (var i=0; i<sources.length; i++) {
+    try {
+      var res = await fetch(RSS + encodeURIComponent(sources[i].url));
+      var data = await res.json();
+      if (data.status === 'ok' && data.items) {
+        var items = data.items.slice(0,8).map(function(item, idx) {
+          return {
+            id: sources[i].source + '_' + idx,
+            title: item.title,
+            url: item.link,
+            published: item.pubDate ? item.pubDate.substring(0,10) : new Date().toISOString().substring(0,10),
+            source: sources[i].source,
+            location: sources[i].location,
+            likes: Math.floor(Math.random()*50)+5
+          };
+        });
+        all = all.concat(items);
+      }
+    } catch(e) { console.warn('RSS 載入失敗:', sources[i].source); }
+  }
+  if (all.length) {
+    var seen = new Set(newsArticles.map(function(a){return a.url;}));
+    var fresh = all.filter(function(a){return !seen.has(a.url);});
+    newsArticles = fresh.concat(newsArticles);
+    renderNewsGrid();
+    renderHomeNews();
+  }
+}
+
+// ═══════════════════════════════════════════
 // PAGE NAVIGATION
 // ═══════════════════════════════════════════
 function showPage(page, pushState) {
@@ -805,20 +833,18 @@ function toggleKeyBar() {
 // CLAUDE API
 // ═══════════════════════════════════════════
 function callClaude(messages, useSearch) {
-  var body = { model: CLAUDE_MODEL, max_tokens: 1000, messages: messages };
-  if (useSearch) body.tools = [{type:'web_search_20250305',name:'web_search'}];
-  return fetch(CLAUDE_API, {
+  // 改用 Vercel API，不需要前端 API Key
+  var question = messages.map(function(m){return m.content;}).join(' ');
+  return fetch('https://labor-intel-api.vercel.app/api/ask', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify(body)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question: question })
   }).then(function(r) {
-    if (!r.ok) return r.json().then(function(e){ throw new Error((e.error&&e.error.message)||'HTTP '+r.status); });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
+  }).then(function(data) {
+    // 轉換成 Claude API 格式
+    return { content: [{ type: 'text', text: data.answer || data.error || '無回應' }] };
   });
 }
 function getText(data) {
@@ -906,7 +932,7 @@ function renderHomeNews() {
   }).join('');
 }
 async function loadFreshNews() {
-  if (!apiKey) { alert('請先設定 API Key'); toggleKeyBar(); return; }
+  // apiKey 檢查已移除，使用 Vercel API
   var btn = document.getElementById('news-refresh-btn');
   var icon = document.getElementById('news-refresh-icon');
   if (btn) btn.disabled = true;
@@ -928,7 +954,7 @@ async function loadFreshNews() {
 async function doTopicSearch() {
   var q = document.getElementById('topic-search-input').value.trim();
   if (!q) return;
-  if (!apiKey) { alert('請先設定 API Key'); toggleKeyBar(); return; }
+  // apiKey 檢查已移除，使用 Vercel API
   var btn = document.getElementById('topic-search-btn');
   var g = document.getElementById('news-grid');
   btn.textContent = '搜尋中…'; btn.disabled = true;
@@ -1055,7 +1081,7 @@ function showGuide(id) {
     + '</div>';
 }
 async function genDoc(title, desc) {
-  if (!apiKey) { alert('請先設定 API Key'); toggleKeyBar(); return; }
+  // apiKey 檢查已移除，使用 Vercel API
   var btn = document.getElementById('gen-doc-btn');
   var res = document.getElementById('gen-doc-result');
   btn.textContent = '生成中…'; btn.disabled = true;
@@ -1072,11 +1098,11 @@ async function genDoc(title, desc) {
 async function doLawSearch() {
   var q = document.getElementById('law-search-input').value.trim();
   if (!q) return;
-  if (!apiKey) { alert('請先設定 API Key'); toggleKeyBar(); return; }
+  // apiKey 檢查已移除，使用 Vercel API
   quickLawSearch(q);
 }
 async function quickLawSearch(q) {
-  if (!apiKey) { setKnowTab('search'); document.getElementById('law-search-input').value=q; alert('請先設定 API Key'); toggleKeyBar(); return; }
+  
   setKnowTab('search');
   if (document.getElementById('law-search-input')) document.getElementById('law-search-input').value=q;
   var res=document.getElementById('law-search-result');
@@ -1174,7 +1200,7 @@ async function sendChat() {
   var input=document.getElementById('chat-input');
   var msg=input.value.trim();
   if(!msg)return;
-  if(!apiKey){alert('請先設定 API Key');toggleKeyBar();return;}
+  // apiKey 檢查已移除，使用 Vercel API
   chatHistory.push({role:'user',text:msg});
   input.value='';
   renderChat();
@@ -1218,7 +1244,7 @@ document.addEventListener('DOMContentLoaded',function(){
   });
   // Enter key for chat
   // Load Notion data in background
-  setTimeout(loadFromNotion, 500);
+  setTimeout(loadRSSNews, 500);
   document.getElementById('chat-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
   document.getElementById('key-input').addEventListener('keydown',function(e){if(e.key==='Enter')saveApiKey();});
   document.getElementById('topic-search-input').addEventListener('keydown',function(e){if(e.key==='Enter')doTopicSearch();});
